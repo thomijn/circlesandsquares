@@ -71,6 +71,7 @@ export class LoadScene extends Phaser.Scene {
             console.log(percent);
         })
 
+        // next scene
         this.load.on("complete", () => {
             this.scene.start(CST.SCENES.MENU);
         });

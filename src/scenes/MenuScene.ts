@@ -10,10 +10,6 @@ export class MenuScene extends Phaser.Scene {
     create() { //creating the menu screen
 
         //create images (z order)
-
-        
-
-        let face = this.add.image(0, 0, CST.IMAGE.TITLE).setOrigin(0).setDepth(0);
         
         let playButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, CST.IMAGE.PLAY).setDepth(1);
 
