@@ -22,17 +22,17 @@ export class PlayScene extends Phaser.Scene {
 
 
 
-        this.load.image("Dungeon", "./assets/image/tileset_dungeon.png");
-        this.load.tilemapTiledJSON("mappy", "./assets/maps/testmap.json");
+        this.load.image("Dungeon", require("../assets/image/tileset_dungeon.png"));
+        this.load.tilemapTiledJSON("mappy", require("../assets/maps/testmap.json"));
 
         this.load.spritesheet('dude',
-            './assets/image/character.png',
+            require('../assets/image/character.png'),
             { frameWidth: 32, frameHeight: 32 }
         );
 
 
         this.load.spritesheet('bait',
-            './assets/image/Food.png',
+            require('../assets/image/Food.png'),
             { frameWidth: 16, frameHeight: 16 }
         );
 

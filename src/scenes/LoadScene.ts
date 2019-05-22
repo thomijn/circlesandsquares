@@ -9,15 +9,13 @@ export class LoadScene extends Phaser.Scene {
 
     }
     loadImages() {
-        this.load.setPath("./assets/image");
+        this.load.image("play_button", require("../assets/image/play_button.png"));
+        this.load.image("options_button", require("../assets/image/options_button.png"));
+        this.load.image("background", require("../assets/image/background.jpg"));
 
-        for (let prop in CST.IMAGE) {
-            //@ts-ignore
-            this.load.image(CST.IMAGE[prop], CST.IMAGE[prop]);
-        }
     }
     loadAudio() {
-        this.load.setPath("./assets/audio");
+        this.load.setPath("../assets/audio");
 
         for (let prop in CST.AUDIO) {
             //@ts-ignore
@@ -27,7 +25,7 @@ export class LoadScene extends Phaser.Scene {
     // @ts-ignore
 
     loadSprites(frameConfig?: Phaser.Loader.FileTypes.ImageFrameConfig) {
-        this.load.setPath("./assets/sprite");
+        this.load.setPath("../assets/sprite");
 
         for (let prop in CST.SPRITE) {
             //@ts-ignore
@@ -38,11 +36,6 @@ export class LoadScene extends Phaser.Scene {
     
 
         //load image, spritesheet, sound
-        this.loadAudio();
-        this.loadSprites({
-            frameHeight: 32,
-            frameWidth: 32
-        });
         this.loadImages();
 
         //create loading bar
