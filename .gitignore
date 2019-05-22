@@ -1,4 +1,4 @@
-/lib
+
 dist/*.js
 dist/*.map
 dist/*.html
@@ -45,7 +45,6 @@ node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
-typings/
 
 # Optional npm cache directory
 .npm
