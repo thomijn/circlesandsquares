@@ -3,6 +3,7 @@
 import { LoadScene } from "./scenes/LoadScene";
 import { MenuScene } from "./scenes/MenuScene";
 import { PlayScene } from "./scenes/PlayScene";
+// @ts-ignore
 let game = new Phaser.Game({
     width: 640,
     height: 480,

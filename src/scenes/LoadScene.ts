@@ -24,6 +24,8 @@ export class LoadScene extends Phaser.Scene {
             this.load.audio(CST.AUDIO[prop], CST.AUDIO[prop]);
         }
     }
+    // @ts-ignore
+
     loadSprites(frameConfig?: Phaser.Loader.FileTypes.ImageFrameConfig) {
         this.load.setPath("./assets/sprite");
 
