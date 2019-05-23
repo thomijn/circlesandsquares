@@ -4,9 +4,10 @@ import { CST } from "../CST";
 export class PlayScene extends Phaser.Scene {
     Keyboard: any;
     player!: Phaser.Physics.Arcade.Sprite;
+
     numberOfBait: number;
     baitTimer: number;
-
+    bait!: Phaser.Physics.Arcade.Sprite;
     constructor() {
 
         super({
@@ -53,6 +54,9 @@ export class PlayScene extends Phaser.Scene {
         // player
         this.player = this.physics.add.sprite(150, 415, 'dude').setDepth(5);
 
+        
+        
+
         //map collisions
         this.physics.add.collider(this.player, top);
         this.physics.add.collider(this.player, wall);
@@ -71,9 +75,6 @@ export class PlayScene extends Phaser.Scene {
 
         });
 
-
-        //
-
         //keyboard input
         this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B")
 
@@ -81,7 +82,11 @@ export class PlayScene extends Phaser.Scene {
 
     update(time: number, delta: number) {
 
-
+        if(this.physics.world.overlap(this.player, this.bait)&& this.Keyboard.B.isDown && this.baitTimer == 1){
+            this.bait.destroy();
+            this.numberOfBait++
+            console.log("works")
+        }
 
         // player movement
         if (this.Keyboard.W.isDown) {
@@ -107,10 +112,10 @@ export class PlayScene extends Phaser.Scene {
             this.player.flipX = false;
         }
 
-        if (this.Keyboard.B.isDown && this.numberOfBait > 0 && this.baitTimer == 1) {
+        if (this.Keyboard.B.isDown && this.numberOfBait > 0 && this.baitTimer == 1 && !this.physics.world.overlap(this.player, this.bait)) {
             this.numberOfBait--
             this.baitTimer = 0
-            this.add.sprite(this.player.x, this.player.y, "bait").setDepth(5).setScale(1.25).setFrame(21);
+            this.bait = this.physics.add.sprite(this.player.x, this.player.y, "bait").setDepth(5).setScale(1.25).setFrame(21).setImmovable(true);
             setTimeout(() => {
                 this.baitTimer = 1
             }, 500);
