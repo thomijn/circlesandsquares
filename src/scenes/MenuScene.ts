@@ -13,11 +13,11 @@ export class MenuScene extends Phaser.Scene {
 
         
 
-        let face = this.add.image(0, 0, CST.IMAGE.TITLE).setOrigin(0).setDepth(0);
+        let face = this.add.image(0, 0, "background").setOrigin(0).setDepth(0);
         
-        let playButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, CST.IMAGE.PLAY).setDepth(1);
+        let playButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2, "play_button").setDepth(1);
 
-        let optionsButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2 + 100, CST.IMAGE.OPTIONS).setDepth(1);
+        let optionsButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2 + 100, "options_button").setDepth(1);
 
     
         playButton.setInteractive();
