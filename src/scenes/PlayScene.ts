@@ -3,10 +3,11 @@ import { CST } from "../CST";
 export class PlayScene extends Phaser.Scene {
   Keyboard: any;
   player!: Phaser.Physics.Arcade.Sprite;
-
   numberOfBait: number;
   baitTimer: number;
   bait!: Phaser.Physics.Arcade.Sprite;
+  baitsgroup!: Phaser.GameObjects.Group;
+  enemy!: Phaser.Physics.Arcade.Sprite;
   constructor() {
     super({
       key: CST.SCENES.PLAY
@@ -44,11 +45,19 @@ export class PlayScene extends Phaser.Scene {
 
     // player
     this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
+    this.enemy = this.physics.add.sprite(496, 432, "dude").setDepth(5);
+
 
     //map collisions
     this.physics.add.collider(this.player, top);
     this.physics.add.collider(this.player, wall);
     this.physics.add.collider(this.player, ground);
+
+    this.physics.add.collider(this.enemy, top);
+    this.physics.add.collider(this.enemy, wall);
+    this.physics.add.collider(this.enemy, ground);
+
+    this.physics.add.collider(this.player, this.enemy)
 
     //tile property
     ground.setCollisionByProperty({ collides: true });
@@ -62,18 +71,23 @@ export class PlayScene extends Phaser.Scene {
       frameRate: 10
     });
 
+    // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
+
     //keyboard input
-    this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B");
+    this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, P");
+
+    // bait group
+    this.baitsgroup = this.add.group()
+
   }
 
   update(time: number, delta: number) {
     // bait pickup
     if (
-      this.physics.world.overlap(this.player, this.bait) &&
+      this.physics.world.overlap(this.player, this.baitsgroup) &&
       this.Keyboard.B.isDown &&
       this.baitTimer == 1
     ) {
-      this.bait.destroy();
       this.numberOfBait++;
       console.log("works");
     }
@@ -106,16 +120,17 @@ export class PlayScene extends Phaser.Scene {
       this.Keyboard.B.isDown &&
       this.numberOfBait > 0 &&
       this.baitTimer == 1 &&
-      !this.physics.world.overlap(this.player, this.bait)
+      !this.physics.world.overlap(this.player, this.baitsgroup)
     ) {
       this.numberOfBait--;
       this.baitTimer = 0;
-      this.bait = this.physics.add
+      this.baitsgroup.add(this.physics.add
         .sprite(this.player.x, this.player.y, "bait")
         .setDepth(5)
         .setScale(1.25)
         .setFrame(21)
-        .setImmovable(true);
+        .setImmovable(true))
+       
       setTimeout(() => {
         this.baitTimer = 1;
       }, 500);
@@ -128,5 +143,8 @@ export class PlayScene extends Phaser.Scene {
     if (this.Keyboard.S.isUp && this.Keyboard.W.isUp) {
       this.player.setVelocityY(0);
     }
+
+
+
   }
 }

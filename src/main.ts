@@ -22,3 +22,4 @@ let game = new Phaser.Game({
     autoCenter: Phaser.Scale.CENTER_BOTH
   }
 });
+
