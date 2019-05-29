@@ -8,6 +8,8 @@ export class PlayScene extends Phaser.Scene {
   bait!: Phaser.Physics.Arcade.Sprite;
   baitsgroup!: Phaser.GameObjects.Group;
   enemy!: Phaser.Physics.Arcade.Sprite;
+  block!: Phaser.Physics.Arcade.Sprite;
+
   constructor() {
     super({
       key: CST.SCENES.PLAY
@@ -30,23 +32,29 @@ export class PlayScene extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16
     });
+
+    this.load.spritesheet("block", require("../assets/image/block.png"), {
+      frameWidth: 32,
+      frameHeight: 32
+    });
   }
+
+
 
   create() {
     //map
     let mappy = this.add.tilemap("mappy");
     let terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon");
+    this.block = this.physics.add.sprite(400, 432, "block").setDepth(5).setImmovable(true);
 
     //layers
-
     let ground = mappy.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
     let wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
     let top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2);
 
     // player
     this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
-    this.enemy = this.physics.add.sprite(496, 432, "dude").setDepth(5);
-
+    this.enemy = this.physics.add.sprite(150, 432, "dude").setDepth(5);
 
     //map collisions
     this.physics.add.collider(this.player, top);
@@ -57,7 +65,14 @@ export class PlayScene extends Phaser.Scene {
     this.physics.add.collider(this.enemy, wall);
     this.physics.add.collider(this.enemy, ground);
 
+    this.physics.add.collider(this.block, top);
+    this.physics.add.collider(this.block, wall);
+    this.physics.add.collider(this.block, ground);
+    
+    //player collisions
     this.physics.add.collider(this.player, this.enemy)
+    // this.physics.add.collider(this.player, this.block)
+    // this.physics.add.collider(this.enemy, this.block)
 
     //tile property
     ground.setCollisionByProperty({ collides: true });
@@ -74,10 +89,11 @@ export class PlayScene extends Phaser.Scene {
     // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
 
     //keyboard input
-    this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, P");
+    this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, P, F");
 
     // bait group
     this.baitsgroup = this.add.group()
+
 
   }
 
@@ -145,6 +161,42 @@ export class PlayScene extends Phaser.Scene {
     }
 
 
+    if(this.physics.world.collide(this.player, this.block)) { //&& this.Keyboard.F.isDown) {
+      console.log("Stukje botising van Bob");
+      if(this.block.body.touching.left) {
+        this.block.setVelocityX(120)
+      } else if (this.block.body.touching.right) {
+        this.block.setVelocityX(-120)
+      }
+      
+    }
 
+    // this.physics.world.collide(this.player, this.block)
+    this.physics.add.overlap(this.player, this.block)
+
+    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.D.isDown && this.Keyboard.F.isDown) {
+    //   console.log("X120")
+    //   this.block.setVelocityX(120)
+    // }
+
+    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.A.isDown && this.Keyboard.F.isDown) {
+    //   console.log("X-120")
+    //   this.block.setVelocityX(-120)
+    //   this.player
+    // }
+
+    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.W.isDown && this.Keyboard.F.isDown) {
+    //   console.log("Y120")
+    //   this.block.setVelocityY(120)
+    // }
+
+    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.S.isDown && this.Keyboard.F.isDown) {
+    //   console.log("Y-120")
+    //   this.block.setVelocityY(-120)
+    // }
+
+    if(this.physics.world.collide(this.block, this.enemy)){
+      this.enemy.destroy()
+    }
   }
 }
