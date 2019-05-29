@@ -86,6 +86,9 @@ export class PlayScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.enemy)
     this.physics.add.collider(this.player, this.block, this.playerCollideBlock, undefined, this);
 
+    //enemy collisions
+    this.physics.add.collider(this.enemy, this.block, this.enemyCollideBlock, undefined, this)
+
     //tile property
     ground.setCollisionByProperty({ collides: true });
     wall.setCollisionByProperty({ collides: true });
@@ -129,6 +132,10 @@ export class PlayScene extends Phaser.Scene {
     } else if (this.block.body.touching.down && this.Keyboard.F.isDown) {
       this.block.setVelocityY(-120)
     }
+  }
+
+  enemyCollideBlock() {
+    this.enemy.setTexture('skeleton');
   }
 
   blockCollideWall(){
@@ -200,20 +207,6 @@ export class PlayScene extends Phaser.Scene {
 
     if(this.physics.world.collide(this.enemy, this.block)) {
       this.enemy.setVelocityX(-100);
-    }
-
-    
-
-    if(this.physics.world.collide(this.enemy, this.block)) {
-      this.enemy.setTexture('skeleton');
-      this.enemy.setDepth(3).setImmovable(true);
-    }
-
-    // this.physics.world.collide(this.player, this.block)
-    this.physics.add.overlap(this.player, this.block)
-
-    if(this.physics.world.collide(this.block, this.enemy)){
-      this.enemy.destroy()
     }
   }
 }
