@@ -649,7 +649,7 @@ function (_Phaser$Scene) {
       //map
       var mappy = this.add.tilemap("mappy");
       var terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon");
-      this.block = this.physics.add.sprite(400, 432, "block").setDepth(5).setImmovable(true); //layers
+      this.block = this.physics.add.sprite(368, 304, "block").setDepth(5).setImmovable(true); //layers
 
       var ground = mappy.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
       var wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
@@ -657,19 +657,21 @@ function (_Phaser$Scene) {
 
       this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
       this.enemy = this.physics.add.sprite(150, 432, "enemy").setDepth(5);
-      this.skeleton = this.physics.add.sprite(300, 432, "skeleton").setDepth(4); //map collisions
+      this.skeleton = this.physics.add.sprite(300, 432, "skeleton").setDepth(4);
+      this.physics.add.collider(this.player, ground); //map collisions
 
-      this.physics.add.collider(this.player, top, this.collideWall, undefined, this);
+      this.physics.add.collider(this.player, top);
       this.physics.add.collider(this.player, wall);
       this.physics.add.collider(this.player, ground);
       this.physics.add.collider(this.enemy, top);
       this.physics.add.collider(this.enemy, wall);
       this.physics.add.collider(this.enemy, ground);
-      this.physics.add.collider(this.block, top);
+      this.physics.add.collider(this.block, top, this.blockCollideWall, undefined, this);
       this.physics.add.collider(this.block, wall);
       this.physics.add.collider(this.block, ground); //player collisions
 
-      this.physics.add.collider(this.player, this.enemy); //tile property
+      this.physics.add.collider(this.player, this.enemy);
+      this.physics.add.collider(this.player, this.block, this.playerCollideBlock, undefined, this); //tile property
 
       ground.setCollisionByProperty({
         collides: true
@@ -708,6 +710,24 @@ function (_Phaser$Scene) {
     key: "collideWall",
     value: function collideWall() {
       console.log("boem!");
+    }
+  }, {
+    key: "playerCollideBlock",
+    value: function playerCollideBlock() {
+      if (this.block.body.touching.left && this.Keyboard.F.isDown) {
+        this.block.setVelocityX(120);
+      } else if (this.block.body.touching.right && this.Keyboard.F.isDown) {
+        this.block.setVelocityX(-120);
+      } else if (this.block.body.touching.up && this.Keyboard.F.isDown) {
+        this.block.setVelocityY(120);
+      } else if (this.block.body.touching.down && this.Keyboard.F.isDown) {
+        this.block.setVelocityY(-120);
+      }
+    }
+  }, {
+    key: "blockCollideWall",
+    value: function blockCollideWall() {
+      console.log("blockCollideWall");
     }
   }, {
     key: "update",
@@ -763,17 +783,6 @@ function (_Phaser$Scene) {
 
       if (this.physics.world.collide(this.enemy, this.block)) {
         this.enemy.setVelocityX(-100);
-      }
-
-      if (this.physics.world.collide(this.player, this.block)) {
-        //&& this.Keyboard.F.isDown) {
-        console.log("Stukje botising van Bob");
-
-        if (this.block.body.touching.left) {
-          this.block.setVelocityX(120);
-        } else if (this.block.body.touching.right) {
-          this.block.setVelocityX(-120);
-        }
       }
 
       if (this.physics.world.collide(this.enemy, this.block)) {
