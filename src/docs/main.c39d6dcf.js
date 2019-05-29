@@ -568,6 +568,8 @@ module.exports = "/character.6e2ca09d.png";
 module.exports = "/Food.2497f5cd.png";
 },{}],"assets/image/block.png":[function(require,module,exports) {
 module.exports = "/block.50bf629f.png";
+},{}],"assets/image/skeleton.png":[function(require,module,exports) {
+module.exports = "/skeleton.148633d9.png";
 },{}],"scenes/PlayScene.ts":[function(require,module,exports) {
 "use strict";
 
@@ -630,6 +632,10 @@ function (_Phaser$Scene) {
         frameWidth: 32,
         frameHeight: 32
       });
+      this.load.spritesheet("skeleton", require("../assets/image/skeleton.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
     }
   }, {
     key: "create",
@@ -644,7 +650,8 @@ function (_Phaser$Scene) {
       var top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // player
 
       this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
-      this.enemy = this.physics.add.sprite(150, 432, "dude").setDepth(5); //map collisions
+      this.enemy = this.physics.add.sprite(150, 432, "dude").setDepth(5);
+      this.skeleton = this.physics.add.sprite(300, 432, "skeleton").setDepth(4); //map collisions
 
       this.physics.add.collider(this.player, top);
       this.physics.add.collider(this.player, wall);
@@ -745,6 +752,11 @@ function (_Phaser$Scene) {
         } else if (this.block.body.touching.right) {
           this.block.setVelocityX(-120);
         }
+      }
+
+      if (this.physics.world.collide(this.enemy, this.block)) {
+        this.enemy.setTexture('skeleton');
+        this.enemy.setDepth(3).setImmovable(true);
       } // this.physics.world.collide(this.player, this.block)
 
 
@@ -776,7 +788,7 @@ function (_Phaser$Scene) {
 }(Phaser.Scene);
 
 exports.PlayScene = PlayScene;
-},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/Food.png":"assets/image/Food.png","../assets/image/block.png":"assets/image/block.png"}],"main.ts":[function(require,module,exports) {
+},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/Food.png":"assets/image/Food.png","../assets/image/block.png":"assets/image/block.png","../assets/image/skeleton.png":"assets/image/skeleton.png"}],"main.ts":[function(require,module,exports) {
 "use strict";
 /** @type {import("./typings/phaser")} */
 
