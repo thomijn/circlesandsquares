@@ -29,6 +29,11 @@ export class PlayScene extends Phaser.Scene {
       frameHeight: 32
     });
 
+    this.load.spritesheet("enemy", require("../assets/image/enemy.png"), {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
     this.load.spritesheet("bait", require("../assets/image/Food.png"), {
       frameWidth: 16,
       frameHeight: 16
@@ -60,7 +65,7 @@ export class PlayScene extends Phaser.Scene {
 
     // player
     this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
-    this.enemy = this.physics.add.sprite(150, 432, "dude").setDepth(5);
+    this.enemy = this.physics.add.sprite(150, 432, "enemy").setDepth(5);
     this.skeleton = this.physics.add.sprite(300, 432, "skeleton").setDepth(4);
 
     //map collisions
@@ -90,6 +95,12 @@ export class PlayScene extends Phaser.Scene {
     this.anims.create({
       key: "walk",
       frames: this.anims.generateFrameNumbers("dude", { start: 3, end: 5 }),
+      frameRate: 10
+    });
+
+    this.anims.create({
+      key: "walkEnemy",
+      frames: this.anims.generateFrameNumbers("enemy", { start: 3, end: 5 }),
       frameRate: 10
     });
 
@@ -167,6 +178,10 @@ export class PlayScene extends Phaser.Scene {
       this.player.setVelocityY(0);
     }
 
+    //enemy auto movement
+    if (this.game.isRunning) {
+      this.enemy.setVelocityX(100);
+      }
 
     if(this.physics.world.collide(this.player, this.block)) { //&& this.Keyboard.F.isDown) {
       console.log("Stukje botising van Bob");
@@ -177,6 +192,8 @@ export class PlayScene extends Phaser.Scene {
       }
       
     }
+
+    
 
     if(this.physics.world.collide(this.enemy, this.block)) {
       this.enemy.setTexture('skeleton');

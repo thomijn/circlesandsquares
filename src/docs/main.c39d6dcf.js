@@ -564,6 +564,8 @@ module.exports = {
 };
 },{}],"assets/image/character.png":[function(require,module,exports) {
 module.exports = "/character.6e2ca09d.png";
+},{}],"assets/image/enemy.png":[function(require,module,exports) {
+module.exports = "/enemy.bb5a0a1e.png";
 },{}],"assets/image/Food.png":[function(require,module,exports) {
 module.exports = "/Food.2497f5cd.png";
 },{}],"assets/image/block.png":[function(require,module,exports) {
@@ -624,6 +626,10 @@ function (_Phaser$Scene) {
         frameWidth: 32,
         frameHeight: 32
       });
+      this.load.spritesheet("enemy", require("../assets/image/enemy.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
       this.load.spritesheet("bait", require("../assets/image/Food.png"), {
         frameWidth: 16,
         frameHeight: 16
@@ -650,7 +656,7 @@ function (_Phaser$Scene) {
       var top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // player
 
       this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
-      this.enemy = this.physics.add.sprite(150, 432, "dude").setDepth(5);
+      this.enemy = this.physics.add.sprite(150, 432, "enemy").setDepth(5);
       this.skeleton = this.physics.add.sprite(300, 432, "skeleton").setDepth(4); //map collisions
 
       this.physics.add.collider(this.player, top);
@@ -680,6 +686,14 @@ function (_Phaser$Scene) {
       this.anims.create({
         key: "walk",
         frames: this.anims.generateFrameNumbers("dude", {
+          start: 3,
+          end: 5
+        }),
+        frameRate: 10
+      });
+      this.anims.create({
+        key: "walkEnemy",
+        frames: this.anims.generateFrameNumbers("enemy", {
           start: 3,
           end: 5
         }),
@@ -741,6 +755,11 @@ function (_Phaser$Scene) {
 
       if (this.Keyboard.S.isUp && this.Keyboard.W.isUp) {
         this.player.setVelocityY(0);
+      } //enemy auto movement
+
+
+      if (this.game.isRunning) {
+        this.enemy.setVelocityX(100);
       }
 
       if (this.physics.world.collide(this.player, this.block)) {
@@ -788,7 +807,7 @@ function (_Phaser$Scene) {
 }(Phaser.Scene);
 
 exports.PlayScene = PlayScene;
-},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/Food.png":"assets/image/Food.png","../assets/image/block.png":"assets/image/block.png","../assets/image/skeleton.png":"assets/image/skeleton.png"}],"main.ts":[function(require,module,exports) {
+},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/enemy.png":"assets/image/enemy.png","../assets/image/Food.png":"assets/image/Food.png","../assets/image/block.png":"assets/image/block.png","../assets/image/skeleton.png":"assets/image/skeleton.png"}],"main.ts":[function(require,module,exports) {
 "use strict";
 /** @type {import("./typings/phaser")} */
 
