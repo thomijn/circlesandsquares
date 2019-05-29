@@ -69,7 +69,7 @@ export class PlayScene extends Phaser.Scene {
     this.skeleton = this.physics.add.sprite(300, 432, "skeleton").setDepth(4);
 
     //map collisions
-    this.physics.add.collider(this.player, top);
+    this.physics.add.collider(this.player, top, this.collideWall, undefined, this);
     this.physics.add.collider(this.player, wall);
     this.physics.add.collider(this.player, ground);
 
@@ -83,8 +83,6 @@ export class PlayScene extends Phaser.Scene {
     
     //player collisions
     this.physics.add.collider(this.player, this.enemy)
-    // this.physics.add.collider(this.player, this.block)
-    // this.physics.add.collider(this.enemy, this.block)
 
     //tile property
     ground.setCollisionByProperty({ collides: true });
@@ -104,15 +102,19 @@ export class PlayScene extends Phaser.Scene {
       frameRate: 10
     });
 
-    // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
-
     //keyboard input
     this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, P, F");
 
     // bait group
     this.baitsgroup = this.add.group()
 
+    // enemy movement
+    this.enemy.setVelocityX(100);
 
+  }
+
+  collideWall(){
+    console.log("boem!")
   }
 
   update(time: number, delta: number) {
@@ -178,10 +180,11 @@ export class PlayScene extends Phaser.Scene {
       this.player.setVelocityY(0);
     }
 
-    //enemy auto movement
-    if (this.game.isRunning) {
-      this.enemy.setVelocityX(100);
-      }
+    if(this.physics.world.collide(this.enemy, this.block)) {
+      this.enemy.setVelocityX(-100);
+    }
+
+    
 
     if(this.physics.world.collide(this.player, this.block)) { //&& this.Keyboard.F.isDown) {
       console.log("Stukje botising van Bob");
@@ -193,8 +196,6 @@ export class PlayScene extends Phaser.Scene {
       
     }
 
-    
-
     if(this.physics.world.collide(this.enemy, this.block)) {
       this.enemy.setTexture('skeleton');
       this.enemy.setDepth(3).setImmovable(true);
@@ -202,27 +203,6 @@ export class PlayScene extends Phaser.Scene {
 
     // this.physics.world.collide(this.player, this.block)
     this.physics.add.overlap(this.player, this.block)
-
-    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.D.isDown && this.Keyboard.F.isDown) {
-    //   console.log("X120")
-    //   this.block.setVelocityX(120)
-    // }
-
-    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.A.isDown && this.Keyboard.F.isDown) {
-    //   console.log("X-120")
-    //   this.block.setVelocityX(-120)
-    //   this.player
-    // }
-
-    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.W.isDown && this.Keyboard.F.isDown) {
-    //   console.log("Y120")
-    //   this.block.setVelocityY(120)
-    // }
-
-    // if(this.physics.world.collide(this.player, this.block) && this.Keyboard.S.isDown && this.Keyboard.F.isDown) {
-    //   console.log("Y-120")
-    //   this.block.setVelocityY(-120)
-    // }
 
     if(this.physics.world.collide(this.block, this.enemy)){
       this.enemy.destroy()
