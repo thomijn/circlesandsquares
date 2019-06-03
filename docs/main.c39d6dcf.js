@@ -338,7 +338,7 @@ module.exports = {
     "x": 0,
     "y": 0
   }, {
-    "data": "LgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAAAAAAAAAAAAA0AAAAAAAAACUAAAAnAAAAAAAAADQAAAAAAAAANAAAAAAAAAAlAAAAJwAAAAAAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAA0AAAANAAAADQAAAAAAAAANQAAADcAAAAAAAAANAAAAAAAAAA0AAAAAAAAADUAAAA3AAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAAAAAAAAuAAAALgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAAAAAAAAAAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAAAAAAAA0AAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAANAAAAC4AAAAuAAAANAAAAAAAAAAAAAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAAAAAAADQAAAAAAAAANAAAADQAAAAAAAAANAAAAAAAAAA0AAAALgAAAC4AAAA0AAAAAAAAACUAAAAnAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAALgAAADQAAAAAAAAANQAAADcAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAADQAAAA0AAAAAAAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAALgAAAC4AAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAAuAAAA",
+    "data": "LgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAAAAAAAAAAAAA0AAAAAAAAACUAAAAnAAAAAAAAADQAAAAAAAAANAAAAAAAAAAlAAAAJwAAAAAAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAA0AAAAKgAAADQAAAAAAAAANQAAADcAAAAAAAAANAAAAAAAAAA0AAAAAAAAADUAAAA3AAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAACoAAAA0AAAANAAAAAAAAAAuAAAALgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAANAAAADQAAAAAAAAANAAAACoAAAA0AAAANAAAAAAAAAA0AAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAAAAAAACoAAAAAAAAANAAAAC4AAAAuAAAANAAAAAAAAAAAAAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAAAAAAACoAAAAAAAAANAAAADQAAAAAAAAANAAAAAAAAAA0AAAALgAAAC4AAAA0AAAAAAAAACUAAAAnAAAANAAAADQAAAAAAAAANAAAACoAAAA0AAAANAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAALgAAADQAAAAAAAAANQAAADcAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAADQAAAA0AAAAAAAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAALgAAAC4AAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAAuAAAA",
     "encoding": "base64",
     "height": 15,
     "id": 3,
@@ -564,6 +564,10 @@ module.exports = {
 };
 },{}],"assets/image/character.png":[function(require,module,exports) {
 module.exports = "/character.6e2ca09d.png";
+},{}],"assets/image/enemy.png":[function(require,module,exports) {
+module.exports = "/enemy.bb5a0a1e.png";
+},{}],"assets/image/block.png":[function(require,module,exports) {
+module.exports = "/block.50bf629f.png";
 },{}],"assets/image/Food.png":[function(require,module,exports) {
 module.exports = "/Food.2497f5cd.png";
 },{}],"scenes/PlayScene.ts":[function(require,module,exports) {
@@ -620,6 +624,14 @@ function (_Phaser$Scene) {
         frameWidth: 32,
         frameHeight: 32
       });
+      this.load.spritesheet("enemy", require("../assets/image/enemy.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
+      this.load.spritesheet("block", require("../assets/image/block.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
       this.load.spritesheet("bait", require("../assets/image/Food.png"), {
         frameWidth: 16,
         frameHeight: 16
@@ -628,25 +640,36 @@ function (_Phaser$Scene) {
   }, {
     key: "create",
     value: function create() {
-      this.cameras.main.setSize(640, 480);
-      this.cameras.main.setViewport(0, 0, 640, 480); //map
-
+      //map
       var mappy = this.add.tilemap("mappy");
-      var terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon"); //layers
+      var terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon");
+      this.block = this.physics.add.sprite(176, 144, "block").setDepth(5).setImmovable(true);
+      this.block2 = this.physics.add.sprite(528, 304, "block").setDepth(5).setImmovable(true);
+      this.block3 = this.physics.add.sprite(300, 304, "block").setDepth(5).setImmovable(true); //layers
 
       var ground = mappy.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
       var wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
       var top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // player
 
       this.player = this.physics.add.sprite(144, 415, "dude").setDepth(5);
-      this.enemy = this.physics.add.sprite(300, 350, "dude").setDepth(5).setImmovable(true); //map collisions
+      this.enemy = this.physics.add.sprite(300, 350, "enemy").setDepth(5).setImmovable(true);
+      this.enemy.flipX = true; //map collisions
 
       this.physics.add.collider(this.player, ground);
       this.physics.add.collider(this.player, wall);
       this.physics.add.collider(this.player, top);
       this.physics.add.collider(this.enemy, ground);
       this.physics.add.collider(this.enemy, wall);
-      this.physics.add.collider(this.enemy, top, this.collidewall, undefined, this); //tile property
+      this.physics.add.collider(this.enemy, top, this.collidewall, undefined, this);
+      this.physics.add.collider(this.block, top);
+      this.physics.add.collider(this.player, this.block, this.bounceWall, undefined, this);
+      this.physics.add.collider(this.block2, top);
+      this.physics.add.collider(this.player, this.block2, this.bounceWall, undefined, this);
+      this.physics.add.collider(this.block3, top);
+      this.physics.add.collider(this.player, this.block3, this.bounceWall, undefined, this);
+      this.physics.add.collider(this.enemy, this.block, this.enemyDie, undefined, this);
+      this.physics.add.collider(this.enemy, this.block2, this.enemyDie, undefined, this);
+      this.physics.add.collider(this.enemy, this.block3); //tile property
 
       ground.setCollisionByProperty({
         collides: true
@@ -665,54 +688,93 @@ function (_Phaser$Scene) {
           end: 5
         }),
         frameRate: 10
+      });
+      this.anims.create({
+        key: "walkenemy",
+        frames: this.anims.generateFrameNumbers("enemy", {
+          start: 0,
+          end: 3
+        }),
+        repeat: -1,
+        frameRate: 10
       }); // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
       //keyboard input
 
       this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, F"); // bait group
 
-      this.baitsgroup = this.add.group();
-      this.enemy.setVelocityY(-100);
-    } // collide(){
-    //     if(this.Keyboard.F.isDown && this.enemy.body.touching.left){
-    //          this.enemy.setVelocityX(128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.right){
-    //         this.enemy.setVelocityX(-128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.up){
-    //         this.enemy.setVelocityY(128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.down){
-    //         this.enemy.setVelocityY(-128)
-    //     }
-    // }
+      this.baitsgroup = this.add.group(); //enemy walking
 
+      this.enemy.setVelocityY(-100); // enemy animation
+
+      this.enemy.play("walkenemy", true);
+    }
+  }, {
+    key: "bounceWall",
+    value: function bounceWall() {
+      //move block when pushed
+      if (this.block.body.touching.left && this.Keyboard.F.isDown) this.block.setVelocityX(175);else if (this.block.body.touching.right && this.Keyboard.F.isDown) {
+        this.block.setVelocityX(-175);
+      } else if (this.block.body.touching.up && this.Keyboard.F.isDown) {
+        this.block.setVelocityY(175);
+      } else if (this.block.body.touching.down && this.Keyboard.F.isDown) {
+        this.block.setVelocityY(-175);
+      }
+      if (this.block2.body.touching.left && this.Keyboard.F.isDown) this.block2.setVelocityX(175);else if (this.block2.body.touching.right && this.Keyboard.F.isDown) {
+        this.block2.setVelocityX(-175);
+      } else if (this.block2.body.touching.up && this.Keyboard.F.isDown) {
+        this.block2.setVelocityY(175);
+      } else if (this.block2.body.touching.down && this.Keyboard.F.isDown) {
+        this.block2.setVelocityY(-175);
+      }
+      if (this.block3.body.touching.left && this.Keyboard.F.isDown) this.block3.setVelocityX(175);else if (this.block3.body.touching.right && this.Keyboard.F.isDown) {
+        this.block3.setVelocityX(-175);
+      } else if (this.block3.body.touching.up && this.Keyboard.F.isDown) {
+        this.block3.setVelocityY(175);
+      } else if (this.block3.body.touching.down && this.Keyboard.F.isDown) {
+        this.block3.setVelocityY(-175);
+      }
+    }
+  }, {
+    key: "enemyDie",
+    value: function enemyDie() {
+      var _this2 = this;
+
+      if (this.block.body.velocity.x !== 0 || this.block.body.velocity.y !== 0) {
+        this.enemy.destroy(); // slow block down
+
+        setTimeout(function () {
+          _this2.block.setVelocity(0);
+        }, 150);
+      } else {
+        this.collidewall();
+      }
+    }
   }, {
     key: "collidewall",
     value: function collidewall() {
+      // AI movement
       var direction = Phaser.Math.Between(1, 4);
-      console.log(direction);
 
       if (direction == 1) {
         this.enemy.setVelocityY(-100);
-        this.enemy.play("walk", true);
       } else if (direction == 2) {
         this.enemy.setVelocityY(100);
-        this.enemy.play("walk", true);
       } else if (direction == 3) {
         this.enemy.setVelocityX(100);
-        this.enemy.play("walk", true);
+        this.enemy.flipX = false;
       } else {
         this.enemy.setVelocityX(-100);
-        this.enemy.play("walk", true);
+        this.enemy.flipX = true;
       }
     }
   }, {
     key: "update",
     value: function update(time, delta) {
-      var _this2 = this;
+      var _this3 = this;
 
       // bait pickup
       if (this.physics.world.overlap(this.player, this.baitsgroup) && this.Keyboard.B.isDown && this.baitTimer == 1) {
         this.numberOfBait++;
-        console.log("works");
       }
 
       if (this.Keyboard.B.isDown && this.numberOfBait > 0 && this.baitTimer == 1 && !this.physics.world.overlap(this.player, this.baitsgroup)) {
@@ -720,7 +782,7 @@ function (_Phaser$Scene) {
         this.baitTimer = 0;
         this.baitsgroup.add(this.physics.add.sprite(this.player.x, this.player.y, "bait").setDepth(5).setScale(1.25).setFrame(21).setImmovable(true));
         setTimeout(function () {
-          _this2.baitTimer = 1;
+          _this3.baitTimer = 1;
         }, 500);
       } // player movement
 
@@ -764,7 +826,7 @@ function (_Phaser$Scene) {
 }(Phaser.Scene);
 
 exports.PlayScene = PlayScene;
-},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/Food.png":"assets/image/Food.png"}],"main.ts":[function(require,module,exports) {
+},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/enemy.png":"assets/image/enemy.png","../assets/image/block.png":"assets/image/block.png","../assets/image/Food.png":"assets/image/Food.png"}],"main.ts":[function(require,module,exports) {
 "use strict";
 /** @type {import("./typings/phaser")} */
 
@@ -825,7 +887,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58298" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50592" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

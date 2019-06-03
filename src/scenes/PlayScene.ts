@@ -8,21 +8,18 @@ export class PlayScene extends Phaser.Scene {
     bait!: Phaser.Physics.Arcade.Sprite;
     baitsgroup!: Phaser.GameObjects.Group;
     enemy!: Phaser.Physics.Arcade.Sprite;
-
+    block!: Phaser.Physics.Arcade.Sprite;
+    block2!: Phaser.Physics.Arcade.Sprite;
+    block3!: Phaser.Physics.Arcade.Sprite;
 
     constructor() {
         super({
             key: CST.SCENES.PLAY
-
         });
 
         this.numberOfBait = 3;
         this.baitTimer = 1;
-  
-
     }
-
-
 
     preload() {
         this.load.image("Dungeon", require("../assets/image/tileset_dungeon.png"));
@@ -33,29 +30,42 @@ export class PlayScene extends Phaser.Scene {
             frameHeight: 32
         });
 
+        this.load.spritesheet("enemy", require("../assets/image/enemy.png"), {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+
+        this.load.spritesheet("block", require("../assets/image/block.png"), {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+
         this.load.spritesheet("bait", require("../assets/image/Food.png"), {
             frameWidth: 16,
             frameHeight: 16
         });
     }
-    create() {
-       
-        this.cameras.main.setSize(640, 480)
-        this.cameras.main.setViewport(0,0,640,480);
 
+    create() {
 
         //map
-        let mappy = this.add.tilemap("mappy",);
+        let mappy = this.add.tilemap("mappy");
         let terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon");
+        this.block = this.physics.add.sprite(176, 144, "block").setDepth(5).setImmovable(true);
+        this.block2 = this.physics.add.sprite(528, 304, "block").setDepth(5).setImmovable(true);
+        this.block3 = this.physics.add.sprite(300, 304, "block").setDepth(5).setImmovable(true);
 
         //layers
         let ground = mappy.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
         let wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
         let top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2);
 
+
+
         // player
         this.player = this.physics.add.sprite(144, 415, "dude").setDepth(5);
-        this.enemy = this.physics.add.sprite(300, 350   , "dude").setDepth(5).setImmovable(true);
+        this.enemy = this.physics.add.sprite(300, 350, "enemy").setDepth(5).setImmovable(true);
+        this.enemy.flipX = true;
 
         //map collisions
         this.physics.add.collider(this.player, ground);
@@ -66,8 +76,20 @@ export class PlayScene extends Phaser.Scene {
         this.physics.add.collider(this.enemy, wall);
         this.physics.add.collider(this.enemy, top, this.collidewall, undefined, this);
 
+        this.physics.add.collider(this.block, top)
+        this.physics.add.collider(this.player, this.block, this.bounceWall, undefined, this)
 
-       
+        this.physics.add.collider(this.block2, top)
+        this.physics.add.collider(this.player, this.block2, this.bounceWall, undefined, this)
+
+        this.physics.add.collider(this.block3, top)
+        this.physics.add.collider(this.player, this.block3, this.bounceWall, undefined, this)
+
+        this.physics.add.collider(this.enemy, this.block, this.enemyDie, undefined, this)
+
+        this.physics.add.collider(this.enemy, this.block2, this.enemyDie, undefined, this)
+
+        this.physics.add.collider(this.enemy, this.block3)
 
         //tile property
         ground.setCollisionByProperty({ collides: true });
@@ -81,6 +103,13 @@ export class PlayScene extends Phaser.Scene {
             frameRate: 10
         });
 
+        this.anims.create({
+            key: "walkenemy",
+            frames: this.anims.generateFrameNumbers("enemy", { start: 0, end: 3 }),
+            repeat: -1,
+            frameRate: 10
+        });
+
         // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
 
         //keyboard input
@@ -89,45 +118,78 @@ export class PlayScene extends Phaser.Scene {
         // bait group
         this.baitsgroup = this.add.group()
 
+        //enemy walking
         this.enemy.setVelocityY(-100)
+
+        // enemy animation
+        this.enemy.play("walkenemy", true)
 
     }
 
-    // collide(){
-    //     if(this.Keyboard.F.isDown && this.enemy.body.touching.left){
-    //          this.enemy.setVelocityX(128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.right){
-    //         this.enemy.setVelocityX(-128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.up){
-    //         this.enemy.setVelocityY(128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.down){
-    //         this.enemy.setVelocityY(-128)
-    //     }
-    // }
+    bounceWall() {
 
-    collidewall(){
-        
-        let direction = Phaser.Math.Between(1, 4)
-        console.log(direction)
-        if(direction == 1) {
-            this.enemy.setVelocityY(-100)
-            this.enemy.play("walk", true);
-        } else if(direction == 2) {
-            this.enemy.setVelocityY(100)
-            this.enemy.play("walk", true);
-
-        } else if(direction ==3) {
-            this.enemy.setVelocityX(100)
-            this.enemy.play("walk", true);
-
-
-        } else{
-            this.enemy.setVelocityX(-100)
-            this.enemy.play("walk", true);
-
+        //move block when pushed
+        if (this.block.body.touching.left && this.Keyboard.F.isDown)
+            this.block.setVelocityX(175)
+        else if (this.block.body.touching.right && this.Keyboard.F.isDown) {
+            this.block.setVelocityX(-175)
+        } else if (this.block.body.touching.up && this.Keyboard.F.isDown) {
+            this.block.setVelocityY(175)
+        } else if (this.block.body.touching.down && this.Keyboard.F.isDown) {
+            this.block.setVelocityY(-175)
         }
 
-       
+        if (this.block2.body.touching.left && this.Keyboard.F.isDown)
+            this.block2.setVelocityX(175)
+        else if (this.block2.body.touching.right && this.Keyboard.F.isDown) {
+            this.block2.setVelocityX(-175)
+        } else if (this.block2.body.touching.up && this.Keyboard.F.isDown) {
+            this.block2.setVelocityY(175)
+        } else if (this.block2.body.touching.down && this.Keyboard.F.isDown) {
+            this.block2.setVelocityY(-175)
+        }
+
+        if (this.block3.body.touching.left && this.Keyboard.F.isDown)
+            this.block3.setVelocityX(175)
+        else if (this.block3.body.touching.right && this.Keyboard.F.isDown) {
+            this.block3.setVelocityX(-175)
+        } else if (this.block3.body.touching.up && this.Keyboard.F.isDown) {
+            this.block3.setVelocityY(175)
+        } else if (this.block3.body.touching.down && this.Keyboard.F.isDown) {
+            this.block3.setVelocityY(-175)
+        }
+    }
+
+    enemyDie() {
+        if (this.block.body.velocity.x !== 0 || this.block.body.velocity.y !== 0) {
+            this.enemy.destroy()
+
+            // slow block down
+            setTimeout(() => {
+                this.block.setVelocity(0);
+            }, 150);
+        } else{
+            this.collidewall()
+        }
+    }
+
+    collidewall() {
+
+        // AI movement
+        let direction =  Phaser.Math.Between(1, 4)
+        if (direction == 1) {
+            this.enemy.setVelocityY(-100)
+        } else if (direction == 2) {
+            this.enemy.setVelocityY(100)
+        } else if (direction == 3) {
+            this.enemy.setVelocityX(100)
+            this.enemy.flipX = false;
+
+        } else {
+            this.enemy.setVelocityX(-100)
+            this.enemy.flipX = true;
+        }
+
     }
 
     update(time: number, delta: number) {
@@ -138,9 +200,7 @@ export class PlayScene extends Phaser.Scene {
             this.baitTimer == 1
         ) {
             this.numberOfBait++;
-            console.log("works");
         }
-
 
         if (
             this.Keyboard.B.isDown &&
@@ -196,8 +256,5 @@ export class PlayScene extends Phaser.Scene {
 
         if (this.physics.world.collide(this.player, this.enemy)) {
         }
-
-
-
     }
 }
