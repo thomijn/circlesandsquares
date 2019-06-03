@@ -130,19 +130,19 @@ exports.CST = {
     PLAY: "PLAY"
   },
   IMAGE: {
-    OPTIONS: "options_button.png",
-    PLAY: "play_button.png",
-    TITLE: "background.jpg"
+    OPTIONS: "options_button2.png",
+    PLAY: "play_button2.png",
+    TITLE: "background2.jpg"
   },
   AUDIO: {},
   SPRITE: {}
 };
-},{}],"assets/image/play_button.png":[function(require,module,exports) {
-module.exports = "/play_button.612f9d30.png";
-},{}],"assets/image/options_button.png":[function(require,module,exports) {
-module.exports = "/options_button.d065e32d.png";
-},{}],"assets/image/background.jpg":[function(require,module,exports) {
-module.exports = "/background.970f52a8.jpg";
+},{}],"assets/image/play_button2.png":[function(require,module,exports) {
+module.exports = "/play_button2.cb213a99.png";
+},{}],"assets/image/options_button2.png":[function(require,module,exports) {
+module.exports = "/options_button2.855eb198.png";
+},{}],"assets/image/background2.jpg":[function(require,module,exports) {
+module.exports = "/background2.80d45458.jpg";
 },{}],"scenes/LoadScene.ts":[function(require,module,exports) {
 "use strict";
 
@@ -189,9 +189,9 @@ function (_Phaser$Scene) {
   }, {
     key: "loadImages",
     value: function loadImages() {
-      this.load.image("play_button", require("../assets/image/play_button.png"));
-      this.load.image("options_button", require("../assets/image/options_button.png"));
-      this.load.image("background", require("../assets/image/background.jpg"));
+      this.load.image("play_button", require("../assets/image/play_button2.png"));
+      this.load.image("options_button", require("../assets/image/options_button2.png"));
+      this.load.image("background", require("../assets/image/background2.jpg"));
     }
   }, {
     key: "loadAudio",
@@ -219,29 +219,69 @@ function (_Phaser$Scene) {
     value: function preload() {
       var _this = this;
 
-      //load image, spritesheet, sound
-      this.loadImages(); //create loading bar
+      this.loadImages(); //load image, spritesheet, sound
 
-      var loadingBar = this.add.graphics({
-        fillStyle: {
-          color: 0xffffff //white
-
+      var progressBar = this.add.graphics();
+      var progressBox = this.add.graphics();
+      progressBox.fillStyle(0x222222, 0.8);
+      progressBox.fillRect(240, 270, 320, 50);
+      var width = this.cameras.main.width;
+      var height = this.cameras.main.height;
+      var loadingText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 50,
+        text: 'Loading...',
+        style: {
+          font: '20px monospace',
+          fill: '#ffffff'
         }
+      });
+      loadingText.setOrigin(0.5, 0.5);
+      var percentText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 5,
+        text: '0%',
+        style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+        }
+      });
+      percentText.setOrigin(0.5, 0.5);
+      var assetText = this.make.text({
+        x: width / 2,
+        y: height / 2 + 50,
+        text: '',
+        style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+        }
+      });
+      assetText.setOrigin(0.5, 0.5);
+      this.load.on('progress', function (value) {
+        percentText.setText(parseInt(value * 100) + '%');
+        progressBar.clear();
+        progressBar.fillStyle(0xffffff, 1);
+        progressBar.fillRect(250, 280, 300 * value, 30);
+      });
+      this.load.on('fileprogress', function (file) {
+        assetText.setText('Loading asset: ' + file.key);
+      });
+      this.load.on("complete", function () {
+        progressBar.destroy();
+        progressBox.destroy();
+        loadingText.destroy();
+        percentText.destroy();
+        assetText.destroy();
+
+        _this.scene.start(CST_1.CST.SCENES.MENU);
       }); //simulate large load
 
-      for (var i = 0; i < 100; i++) {
+      for (var i = 0; i < 200; i++) {
         this.load.spritesheet("cat" + i, "./assets/cat.png", {
           frameHeight: 32,
           frameWidth: 32
         });
       }
-
-      this.load.on("progress", function (percent) {
-        loadingBar.fillRect(0, _this.game.renderer.height / 2, _this.game.renderer.width * percent, 50);
-      });
-      this.load.on("complete", function () {
-        _this.scene.start(CST_1.CST.SCENES.MENU);
-      });
     }
   }, {
     key: "create",
@@ -252,7 +292,7 @@ function (_Phaser$Scene) {
 }(Phaser.Scene);
 
 exports.LoadScene = LoadScene;
-},{"../CST":"CST.ts","../assets/image/play_button.png":"assets/image/play_button.png","../assets/image/options_button.png":"assets/image/options_button.png","../assets/image/background.jpg":"assets/image/background.jpg"}],"scenes/MenuScene.ts":[function(require,module,exports) {
+},{"../CST":"CST.ts","../assets/image/play_button2.png":"assets/image/play_button2.png","../assets/image/options_button2.png":"assets/image/options_button2.png","../assets/image/background2.jpg":"assets/image/background2.jpg"}],"scenes/MenuScene.ts":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -326,7 +366,7 @@ module.exports = {
   "height": 15,
   "infinite": false,
   "layers": [{
-    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "data": "AgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAApAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKwAAACkAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAArAAAAKQAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACsAAAApAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKwAAACkAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAArAAAAKQAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACsAAAApAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKwAAACkAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAArAAAAKQAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACsAAAApAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKwAAACkAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAArAAAAKQAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACsAAAApAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKwAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAA",
     "encoding": "base64",
     "height": 15,
     "id": 1,
@@ -338,7 +378,19 @@ module.exports = {
     "x": 0,
     "y": 0
   }, {
-    "data": "LgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAAAAAAAAAAAAA0AAAAAAAAACUAAAAnAAAAAAAAADQAAAAAAAAANAAAAAAAAAAlAAAAJwAAAAAAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAA0AAAANAAAADQAAAAAAAAANQAAADcAAAAAAAAANAAAAAAAAAA0AAAAAAAAADUAAAA3AAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAAAAAAAAuAAAALgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAAAAAAAAAAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAAAAAAAA0AAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAANAAAAC4AAAAuAAAANAAAAAAAAAAAAAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAAAAAAADQAAAAAAAAANAAAADQAAAAAAAAANAAAAAAAAAA0AAAALgAAAC4AAAA0AAAAAAAAACUAAAAnAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAALgAAADQAAAAAAAAANQAAADcAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAADQAAAA0AAAAAAAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAALgAAAC4AAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAAuAAAA",
+    "data": "LwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC0AAAAvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAALQAAAC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAALwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC0AAAAvAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALQAAAC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAALwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC0AAAAvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALQAAAC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAALwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC0AAAAvAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALQAAAC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAALwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAC0AAAAvAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALQAAAC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAA",
+    "encoding": "base64",
+    "height": 15,
+    "id": 2,
+    "name": "wall",
+    "opacity": 1,
+    "type": "tilelayer",
+    "visible": true,
+    "width": 20,
+    "x": 0,
+    "y": 0
+  }, {
+    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAANAAAAAAAAAAlAAAAJgAAACcAAAAAAAAAJQAAACYAAAAnAAAAAAAAACUAAAAmAAAAJwAAAAAAAAAlAAAAJgAAACcAAAAAAAAAAAAAADQAAAA0AAAAAAAAAC0AAAAuAAAALwAAAAAAAAAtAAAALgAAAC8AAAAAAAAALQAAAC4AAAAvAAAAAAAAAC0AAAAuAAAALwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANQAAADYAAAA3AAAAAAAAADUAAAA2AAAANwAAAAAAAAA1AAAANgAAADcAAAAAAAAANQAAADYAAAA3AAAAAAAAAAAAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAA0AAAAAAAAACUAAAAmAAAAJwAAAAAAAAAlAAAAJgAAACcAAAAAAAAAJQAAACYAAAAnAAAAAAAAACUAAAAmAAAAJwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALQAAAC4AAAAvAAAAAAAAAC0AAAAuAAAALwAAAAAAAAAtAAAALgAAAC8AAAAAAAAALQAAAC4AAAAvAAAAAAAAAAAAAAA0AAAANAAAAAAAAAA1AAAANgAAADcAAAAAAAAANQAAADYAAAA3AAAAAAAAADUAAAA2AAAANwAAAAAAAAA1AAAANgAAADcAAAAAAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJQAAACYAAAAnAAAAAAAAACUAAAAmAAAAJwAAAAAAAAAlAAAAJgAAACcAAAAAAAAAJQAAACYAAAAnAAAAAAAAAAAAAAA0AAAANAAAAAAAAAAtAAAALgAAAC8AAAAAAAAALQAAAC4AAAAvAAAAAAAAAC0AAAAuAAAALwAAAAAAAAAtAAAALgAAAC8AAAAAAAAAAAAAADQAAAA0AAAAAAAAADUAAAA2AAAANwAAAAAAAAA1AAAANgAAADcAAAAAAAAANQAAADYAAAA3AAAAAAAAADUAAAA2AAAANwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     "encoding": "base64",
     "height": 15,
     "id": 3,
@@ -349,20 +401,8 @@ module.exports = {
     "width": 20,
     "x": 0,
     "y": 0
-  }, {
-    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    "encoding": "base64",
-    "height": 15,
-    "id": 4,
-    "name": "wall",
-    "opacity": 1,
-    "type": "tilelayer",
-    "visible": true,
-    "width": 20,
-    "x": 0,
-    "y": 0
   }],
-  "nextlayerid": 5,
+  "nextlayerid": 4,
   "nextobjectid": 1,
   "orientation": "orthogonal",
   "renderorder": "right-down",
@@ -628,9 +668,7 @@ function (_Phaser$Scene) {
   }, {
     key: "create",
     value: function create() {
-      this.cameras.main.setSize(640, 480);
-      this.cameras.main.setViewport(0, 0, 640, 480); //map
-
+      //map
       var mappy = this.add.tilemap("mappy");
       var terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon"); //layers
 
@@ -638,15 +676,16 @@ function (_Phaser$Scene) {
       var wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
       var top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // player
 
-      this.player = this.physics.add.sprite(144, 415, "dude").setDepth(5);
-      this.enemy = this.physics.add.sprite(300, 350, "dude").setDepth(5).setImmovable(true); //map collisions
+      this.player = this.physics.add.sprite(150, 415, "dude").setDepth(5);
+      this.enemy = this.physics.add.sprite(496, 432, "dude").setDepth(5); //map collisions
 
-      this.physics.add.collider(this.player, ground);
-      this.physics.add.collider(this.player, wall);
       this.physics.add.collider(this.player, top);
-      this.physics.add.collider(this.enemy, ground);
+      this.physics.add.collider(this.player, wall);
+      this.physics.add.collider(this.player, ground);
+      this.physics.add.collider(this.enemy, top);
       this.physics.add.collider(this.enemy, wall);
-      this.physics.add.collider(this.enemy, top, this.collidewall, undefined, this); //tile property
+      this.physics.add.collider(this.enemy, ground);
+      this.physics.add.collider(this.player, this.enemy); //tile property
 
       ground.setCollisionByProperty({
         collides: true
@@ -668,41 +707,9 @@ function (_Phaser$Scene) {
       }); // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
       //keyboard input
 
-      this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, F"); // bait group
+      this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, P"); // bait group
 
       this.baitsgroup = this.add.group();
-      this.enemy.setVelocityY(-100);
-    } // collide(){
-    //     if(this.Keyboard.F.isDown && this.enemy.body.touching.left){
-    //          this.enemy.setVelocityX(128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.right){
-    //         this.enemy.setVelocityX(-128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.up){
-    //         this.enemy.setVelocityY(128)
-    //     } else if(this.Keyboard.F.isDown && this.enemy.body.touching.down){
-    //         this.enemy.setVelocityY(-128)
-    //     }
-    // }
-
-  }, {
-    key: "collidewall",
-    value: function collidewall() {
-      var direction = Phaser.Math.Between(1, 4);
-      console.log(direction);
-
-      if (direction == 1) {
-        this.enemy.setVelocityY(-100);
-        this.enemy.play("walk", true);
-      } else if (direction == 2) {
-        this.enemy.setVelocityY(100);
-        this.enemy.play("walk", true);
-      } else if (direction == 3) {
-        this.enemy.setVelocityX(100);
-        this.enemy.play("walk", true);
-      } else {
-        this.enemy.setVelocityX(-100);
-        this.enemy.play("walk", true);
-      }
     }
   }, {
     key: "update",
@@ -713,15 +720,6 @@ function (_Phaser$Scene) {
       if (this.physics.world.overlap(this.player, this.baitsgroup) && this.Keyboard.B.isDown && this.baitTimer == 1) {
         this.numberOfBait++;
         console.log("works");
-      }
-
-      if (this.Keyboard.B.isDown && this.numberOfBait > 0 && this.baitTimer == 1 && !this.physics.world.overlap(this.player, this.baitsgroup)) {
-        this.numberOfBait--;
-        this.baitTimer = 0;
-        this.baitsgroup.add(this.physics.add.sprite(this.player.x, this.player.y, "bait").setDepth(5).setScale(1.25).setFrame(21).setImmovable(true));
-        setTimeout(function () {
-          _this2.baitTimer = 1;
-        }, 500);
       } // player movement
 
 
@@ -748,6 +746,15 @@ function (_Phaser$Scene) {
         this.player.flipX = false;
       }
 
+      if (this.Keyboard.B.isDown && this.numberOfBait > 0 && this.baitTimer == 1 && !this.physics.world.overlap(this.player, this.baitsgroup)) {
+        this.numberOfBait--;
+        this.baitTimer = 0;
+        this.baitsgroup.add(this.physics.add.sprite(this.player.x, this.player.y, "bait").setDepth(5).setScale(1.25).setFrame(21).setImmovable(true));
+        setTimeout(function () {
+          _this2.baitTimer = 1;
+        }, 500);
+      }
+
       if (this.Keyboard.A.isUp && this.Keyboard.D.isUp) {
         this.player.setVelocityX(0);
       }
@@ -755,8 +762,6 @@ function (_Phaser$Scene) {
       if (this.Keyboard.S.isUp && this.Keyboard.W.isUp) {
         this.player.setVelocityY(0);
       }
-
-      if (this.physics.world.collide(this.player, this.enemy)) {}
     }
   }]);
 
@@ -797,7 +802,7 @@ var game = new Phaser.Game({
     autoCenter: Phaser.Scale.CENTER_BOTH
   }
 });
-},{"./scenes/LoadScene":"scenes/LoadScene.ts","./scenes/MenuScene":"scenes/MenuScene.ts","./scenes/PlayScene":"scenes/PlayScene.ts"}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./scenes/LoadScene":"scenes/LoadScene.ts","./scenes/MenuScene":"scenes/MenuScene.ts","./scenes/PlayScene":"scenes/PlayScene.ts"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -825,7 +830,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49625" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50559" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -1000,5 +1005,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main.ts"], null)
+},{}]},{},["../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main.ts"], null)
 //# sourceMappingURL=/main.c39d6dcf.js.map
