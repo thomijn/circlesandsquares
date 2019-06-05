@@ -3,6 +3,7 @@
 import { Arcade } from "./utils/arcade"
 import { LoadScene } from "./scenes/LoadScene";
 import { MenuScene } from "./scenes/MenuScene";
+import { OpeningScene } from "./scenes/OpeningScene";
 import { PlayScene } from "./scenes/PlayScene";
 import { GameOverScene } from "./scenes/GameOverScene";
 // @ts-ignore
@@ -11,7 +12,7 @@ import { GameOverScene } from "./scenes/GameOverScene";
 const config: Phaser.Types.Core.GameConfig = {
   width: 640,
   height: 480,
-  scene: [LoadScene, MenuScene, PlayScene, GameOverScene],
+  scene: [LoadScene, MenuScene,OpeningScene, PlayScene, GameOverScene],
   render: {
     pixelArt: true
   },

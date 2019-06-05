@@ -6,7 +6,7 @@ import { bait } from "../objects/bait";
 import { Arcade } from "../utils/arcade";
 
 
-export class PlayScene extends Phaser.Scene {
+export class OpeningScene extends Phaser.Scene {
     private player!: characterBait;
     private blockGroup! : Phaser.Physics.Arcade.Group
     private enemy!: enemy
@@ -17,7 +17,7 @@ export class PlayScene extends Phaser.Scene {
 
     constructor() {
         super({
-            key: CST.SCENES.PLAY
+            key: CST.SCENES.OPENING
         });
 
         document.addEventListener("joystick1button1", () => this.placeBait ())
@@ -27,23 +27,23 @@ export class PlayScene extends Phaser.Scene {
     create() {
 
         //map
-        let mappy = this.add.tilemap("mappy");
-        let terrain = mappy.addTilesetImage("dungeonTileset", "Dungeon");
+        let openingMap = this.add.tilemap("openingScene");
+        let terrain = openingMap.addTilesetImage("tilesetDungeon", "Dungeon");
 
         //layers
-        let ground = mappy.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
-        let wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
-        let top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2);
+        let ground = openingMap.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
+        let wall = openingMap.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
+        let top = openingMap.createStaticLayer("top", [terrain], 0, 0).setDepth(2);
 
-        // pushable blocks
-        let pushableBlocks = [];
-        pushableBlocks = mappy.createFromObjects("pushBlocks", 65, {key: "pushableBlocks" })
-
-        this.blockGroup = this.physics.add.group()
-
-        for (let i = 0; i < pushableBlocks.length; i++ ) {
-            this.blockGroup.add(new pushBlock(this, pushableBlocks[i].x, pushableBlocks[i].y ))
-        }
+         // pushable blocks
+         let pushableBlocks = [];
+         pushableBlocks = openingMap.createFromObjects("pushBlocks", 65, {key: "pushableBlocks" })
+ 
+         this.blockGroup = this.physics.add.group()
+ 
+         for (let i = 0; i < pushableBlocks.length; i++ ) {
+             this.blockGroup.add(new pushBlock(this, pushableBlocks[i].x, pushableBlocks[i].y ))
+         }
 
         //bait
         this.baitGroup = this.add.group({ runChildUpdate: true })
@@ -133,8 +133,11 @@ export class PlayScene extends Phaser.Scene {
             this.placeBait()
         }
 
+        console.log()
+
         this.player.update()
         this.enemy.update()
         
     }
 }
+
