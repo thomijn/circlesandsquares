@@ -1,16 +1,16 @@
-/** @type {import("./typings/phaser")} */
-
+import "phaser";
 import { Arcade } from "./utils/arcade"
 import { LoadScene } from "./scenes/LoadScene";
 import { MenuScene } from "./scenes/MenuScene";
 import { PlayScene } from "./scenes/PlayScene";
 import { GameOverScene } from "./scenes/GameOverScene";
-// @ts-ignore
+
 
 
 const config: Phaser.Types.Core.GameConfig = {
   width: 640,
   height: 480,
+  // @ts-ignore
   scene: [LoadScene, MenuScene, PlayScene, GameOverScene],
   render: {
     pixelArt: true

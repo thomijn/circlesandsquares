@@ -5,10 +5,9 @@ import { enemy } from "../objects/enemy";
 import { bait } from "../objects/bait";
 import { Arcade } from "../utils/arcade";
 
-
 export class PlayScene extends Phaser.Scene {
-    private player!: characterBait;
-    private blockGroup! : Phaser.Physics.Arcade.Group
+    private player: characterBait;
+    private blockGroup : Phaser.Physics.Arcade.Group
     private enemy!: enemy
     private baitGroup!: Phaser.GameObjects.Group
     private baitCounter: number
@@ -24,7 +23,7 @@ export class PlayScene extends Phaser.Scene {
         this.baitCounter = 3;
     }
 
-    create() {
+    create(): void {
 
         //map
         let mappy = this.add.tilemap("mappy");
@@ -37,9 +36,9 @@ export class PlayScene extends Phaser.Scene {
 
         // pushable blocks
         let pushableBlocks = [];
-        pushableBlocks = mappy.createFromObjects("pushBlocks", 65, {key: "pushableBlocks" })
+        pushableBlocks = mappy.createFromObjects("pushBlocks", 65, { key: "pushableBlocks" })
 
-        this.blockGroup = this.physics.add.group()
+        this.blockGroup = this.physics.add.group({ runChildUpdate: true })
 
         for (let i = 0; i < pushableBlocks.length; i++ ) {
             this.blockGroup.add(new pushBlock(this, pushableBlocks[i].x, pushableBlocks[i].y ))
@@ -59,6 +58,7 @@ export class PlayScene extends Phaser.Scene {
         this.physics.add.collider(this.player, wall);
         this.physics.add.collider(this.player, top);
 
+        this.physics.add.collider(this.player, blockkek)
         this.physics.add.collider(this.player, this.blockGroup, this.bounceWall, undefined, this)
         this.physics.add.collider(this.player, this.enemy, this.gameOver, undefined, this)
 
@@ -66,10 +66,10 @@ export class PlayScene extends Phaser.Scene {
         this.physics.add.collider(this.enemy, wall);
         this.physics.add.collider(this.enemy, top, this.collidewall, undefined, this);
 
-        this.physics.add.collider(this.enemy, this.blockGroup, this.enemyDie, undefined, this)
+        // this.physics.add.collider(this.enemy, this.blockGroup, this.enemyDie, undefined, this)
 
         this.physics.add.collider(this.blockGroup, top)
-
+        
         this.physics.add.overlap(this.player, this.baitGroup, this.pickupBait, undefined, this)
 
         //tile property collisions
@@ -79,7 +79,6 @@ export class PlayScene extends Phaser.Scene {
 
         this.keyObj = this.input.keyboard.addKey('B');  // Get key object
         this.Keyboard = this.input.keyboard.addKeys("F");
-
     }
 
     placeBait() {
@@ -89,21 +88,22 @@ export class PlayScene extends Phaser.Scene {
         }
     }
 
-    pickupBait(b: bait) {
-        console.log("moi")
+    pickupBait(p: characterBait, en:bait) {
+        console.log("pick-up bait")
     }
 
-    bounceWall(b: pushBlock) {
+    bounceWall(p:characterBait, b:pushBlock) : void {
+        
           //move block when pushed
-          if (b.body.touching.left && this.Keyboard.F.isDown)
+        if (b.body.touching.left && this.Keyboard.F.isDown) {
           b.setVelocityX(175)
-      else if (b.body.touching.right && this.Keyboard.F.isDown) {
-          b.setVelocityX(-175)
-      } else if (b.body.touching.up && this.Keyboard.F.isDown) {
-          b.setVelocityY(175)
-      } else if (b.body.touching.down && this.Keyboard.F.isDown) {
-          b.setVelocityY(-175)
-      }
+        } else if (b.body.touching.right && this.Keyboard.F.isDown) {
+            b.setVelocityX(-175)
+        } else if (b.body.touching.up && this.Keyboard.F.isDown) {
+            b.setVelocityY(175)
+        } else if (b.body.touching.down && this.Keyboard.F.isDown) {
+            b.setVelocityY(-175)
+        }
     }
 
     collidewall() {

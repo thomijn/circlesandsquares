@@ -30,6 +30,12 @@ export class LoadScene extends Phaser.Scene {
     this.load.image("play_button", require("../assets/image/play_button2.png"));
     this.load.image("options_button", require("../assets/image/options_button2.png"));
     this.load.image("background", require("../assets/image/background2.jpg"));
+
+    this.load.spritesheet("smoke", require("../assets/image/smoke.gif"), {
+      frameWidth: 32,
+      frameHeight: 32
+  });
+
   }
 
   preload() {
