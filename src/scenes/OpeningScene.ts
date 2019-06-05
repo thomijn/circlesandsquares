@@ -26,6 +26,10 @@ export class OpeningScene extends Phaser.Scene {
 
     create() {
 
+        //text
+        this.add.text(400, 420, 'Press F to pay respect', { fontFamily: 'Arial', fontSize: 12, color: '#ff3434' }).setOrigin(0.5).setDepth(5)
+
+
         //map
         let openingMap = this.add.tilemap("openingScene");
         let terrain = openingMap.addTilesetImage("tilesetDungeon", "Dungeon");
@@ -37,8 +41,10 @@ export class OpeningScene extends Phaser.Scene {
 
          // pushable blocks
          let pushableBlocks = [];
-         pushableBlocks = openingMap.createFromObjects("pushBlocks", 65, {key: "pushableBlocks" })
- 
+         pushableBlocks = openingMap.createFromObjects("pushBlocks", 52, {key: "pushBlock" })
+         
+        console.log(pushableBlocks)
+
          this.blockGroup = this.physics.add.group()
  
          for (let i = 0; i < pushableBlocks.length; i++ ) {
@@ -132,8 +138,6 @@ export class OpeningScene extends Phaser.Scene {
         if (this.input.keyboard.checkDown(this.keyObj, 500)) {
             this.placeBait()
         }
-
-        console.log()
 
         this.player.update()
         this.enemy.update()

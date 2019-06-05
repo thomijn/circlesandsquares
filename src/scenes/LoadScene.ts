@@ -110,7 +110,7 @@ export class LoadScene extends Phaser.Scene {
     });
 
     //simulate large load
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 100; i++) {
       this.load.spritesheet("cat" + i, "./assets/cat.png", {
         frameHeight: 32,
         frameWidth: 32

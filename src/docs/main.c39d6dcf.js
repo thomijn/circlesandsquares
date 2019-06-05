@@ -738,7 +738,7 @@ module.exports = {
     "x": 0,
     "y": 0
   }, {
-    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     "encoding": "base64",
     "height": 15,
     "id": 2,
@@ -768,18 +768,7 @@ module.exports = {
     "objects": [{
       "gid": 52,
       "height": 32,
-      "id": 1,
-      "name": "",
-      "rotation": 0,
-      "type": "",
-      "visible": true,
-      "width": 32,
-      "x": 192,
-      "y": 224
-    }, {
-      "gid": 52,
-      "height": 32,
-      "id": 2,
+      "id": 22,
       "name": "",
       "rotation": 0,
       "type": "",
@@ -788,71 +777,16 @@ module.exports = {
       "x": 192,
       "y": 320
     }, {
-      "gid": 40,
+      "gid": 52,
       "height": 32,
-      "id": 3,
+      "id": 23,
       "name": "",
       "rotation": 0,
       "type": "",
       "visible": true,
       "width": 32,
-      "x": 192,
-      "y": 256
-    }, {
-      "gid": 40,
-      "height": 32,
-      "id": 4,
-      "name": "",
-      "rotation": 0,
-      "type": "",
-      "visible": true,
-      "width": 32,
-      "x": 192,
-      "y": 288
-    }, {
-      "gid": 40,
-      "height": 32,
-      "id": 5,
-      "name": "",
-      "rotation": 0,
-      "type": "",
-      "visible": true,
-      "width": 32,
-      "x": 160,
-      "y": 192
-    }, {
-      "gid": 40,
-      "height": 32,
-      "id": 6,
-      "name": "",
-      "rotation": 0,
-      "type": "",
-      "visible": true,
-      "width": 32,
-      "x": 128,
-      "y": 160
-    }, {
-      "gid": 40,
-      "height": 32,
-      "id": 7,
-      "name": "",
-      "rotation": 0,
-      "type": "",
-      "visible": true,
-      "width": 32,
-      "x": 128,
-      "y": 128
-    }, {
-      "gid": 40,
-      "height": 32,
-      "id": 8,
-      "name": "",
-      "rotation": 0,
-      "type": "",
-      "visible": true,
-      "width": 32,
-      "x": 160,
-      "y": 352
+      "x": 448,
+      "y": 224
     }],
     "opacity": 1,
     "properties": [{
@@ -866,7 +800,7 @@ module.exports = {
     "y": 0
   }],
   "nextlayerid": 5,
-  "nextobjectid": 11,
+  "nextobjectid": 24,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.2.4",
@@ -1471,7 +1405,7 @@ function (_Phaser$Scene) {
         _this.scene.start(CST_1.CST.SCENES.MENU);
       }); //simulate large load
 
-      for (var i = 0; i < 200; i++) {
+      for (var i = 0; i < 100; i++) {
         this.load.spritesheet("cat" + i, "./assets/cat.png", {
           frameHeight: 32,
           frameWidth: 32
@@ -1750,7 +1684,6 @@ function (_Phaser$Physics$Arcad) {
     _classCallCheck(this, pushBlock);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(pushBlock).call(this, scene, x, y, "pushBlock"));
-    _this.playScene = scene;
 
     _this.scene.add.existing(_assertThisInitialized(_this));
 
@@ -1995,7 +1928,13 @@ function (_Phaser$Scene) {
   _createClass(OpeningScene, [{
     key: "create",
     value: function create() {
-      //map
+      //text
+      this.add.text(400, 420, 'Press F to pay respect', {
+        fontFamily: 'Arial',
+        fontSize: 12,
+        color: '#ff3434'
+      }).setOrigin(0.5).setDepth(5); //map
+
       var openingMap = this.add.tilemap("openingScene");
       var terrain = openingMap.addTilesetImage("tilesetDungeon", "Dungeon"); //layers
 
@@ -2004,9 +1943,10 @@ function (_Phaser$Scene) {
       var top = openingMap.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // pushable blocks
 
       var pushableBlocks = [];
-      pushableBlocks = openingMap.createFromObjects("pushBlocks", 65, {
-        key: "pushableBlocks"
+      pushableBlocks = openingMap.createFromObjects("pushBlocks", 52, {
+        key: "pushBlock"
       });
+      console.log(pushableBlocks);
       this.blockGroup = this.physics.add.group();
 
       for (var i = 0; i < pushableBlocks.length; i++) {
@@ -2103,7 +2043,6 @@ function (_Phaser$Scene) {
         this.placeBait();
       }
 
-      console.log();
       this.player.update();
       this.enemy.update();
     }
