@@ -8,18 +8,38 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     create() {
-        let playAgainButton = this.add.text(400, 420, 'CLICK TO PLAY AGAIN ', { fontFamily: 'Arial', fontSize: 22, color: '#ff3434' }).setOrigin(0.5).setDepth(5)
+        let restartButton = this.add
+            .image(
+                this.game.renderer.width / 2,
+                this.game.renderer.height / 2,
+                "restart_button"
+            )
+            .setDepth(1);
 
-        playAgainButton.setInteractive();
+        let menuButton = this.add
+            .image(
+                this.game.renderer.width / 2,
+                this.game.renderer.height / 2 + 100,
+                "menu_button"
+            )
+            .setDepth(1);
 
-        playAgainButton.on("pointerup", () => {
+            restartButton.setInteractive();
+
+            restartButton.on("pointerup", () => {
             this.scene.start(CST.SCENES.PLAY);
-        });
+            });
+
+            menuButton.setInteractive();
+
+            menuButton.on("pointerup", () => {
+                this.scene.start(CST.SCENES.MENU);
+            });
 
         this.add
-            .image(0, 0, "background")
-            .setOrigin(0)
-            .setDepth(0);
+        .image(0, 0, "background")
+        .setOrigin(0)
+        .setDepth(0);
     }
 
 }
