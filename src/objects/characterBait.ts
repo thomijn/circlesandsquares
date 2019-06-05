@@ -1,13 +1,12 @@
 import { PlayScene } from "../scenes/PlayScene";
 import { Arcade } from "../utils/arcade";
 import { MonsterHunter } from "../main";
-import { setInterval } from "timers";
 
 export class characterBait extends Phaser.Physics.Arcade.Sprite {
   private playScene: PlayScene;
   private keyboard: any;
   private arcade: Arcade;
-  private emitter!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
   constructor(scene: PlayScene) {
     super(scene, 144, 415, "characterBait");
@@ -22,7 +21,7 @@ export class characterBait extends Phaser.Physics.Arcade.Sprite {
     this.addPhysics();
     this.addAnimations();
     this.addParticles();
-    this.body.setSize(32,28)
+    this.body.setSize(32, 28)
 
     this.keyboard = this.scene.input.keyboard.addKeys("W, A, S, D, B, F");
   }
@@ -37,10 +36,17 @@ export class characterBait extends Phaser.Physics.Arcade.Sprite {
     this.keyboardInput();
     this.joystickInput();
 
+    if(this.body.velocity.x !== 0 || this.body.velocity.y !== 0){
+      this.emitter.start()
+      this.emitter.startFollow(this)
+    } else {
+      this.emitter.stop()
+    }
+
+    //fading particles
     this.emitter.forEachAlive(function(particle) {
        particle.alpha = particle.life / 1000, 0, 1;
     }, this);
-
   }
 
   public addAnimations(): void {
@@ -82,14 +88,11 @@ export class characterBait extends Phaser.Physics.Arcade.Sprite {
     var particles = this.scene.add.particles('smoke');
 
     this.emitter = particles.createEmitter({
-      on: true,
       lifespan: 400,
       speed: 30,
-      y:10  ,
+      y: 10,
       scale: { start: 0.1, end: 0.05 },
     });
-    
-    this.emitter.startFollow(this)
   };
 
   private keyboardInput(): void {

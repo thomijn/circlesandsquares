@@ -36,6 +36,11 @@ export class LoadScene extends Phaser.Scene {
       frameHeight: 32
   });
 
+  this.load.spritesheet("smokeblock", require("../assets/image/smokeblock.png"), {
+    frameWidth: 32,
+    frameHeight: 32
+});
+
   }
 
   preload() {
