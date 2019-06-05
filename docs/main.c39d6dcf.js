@@ -117,7 +117,305 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"CST.ts":[function(require,module,exports) {
+})({"utils/joystick.ts":[function(require,module,exports) {
+"use strict";
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Joystick =
+/*#__PURE__*/
+function () {
+  /**
+   * Creates a joystick object for one player
+   * @param joystickNumber The number of the first joystick starts at 0
+   * @param numOfButtons The number of buttons needed by your game
+   */
+  function Joystick(joystickNumber, numOfButtons) {
+    _classCallCheck(this, Joystick);
+
+    // BUT1 and BUT2 are the indexes of the redirect function. 
+    // When both are pressed, redirect to homepage
+    this.BUT1 = 8;
+    this.BUT2 = 9; // FIELDS
+
+    this.joystickNumber = 0;
+    this.numberOfBUttons = 0;
+    this.axes = []; // private isConnected     : boolean = false
+
+    this.isConnected = false;
+    this.joystickNumber = joystickNumber;
+    this.numberOfBUttons = numOfButtons;
+  } // PROPERTIES
+  // axes for directional use 
+  // values are -1, 0, 1 because arcade sticks are digital
+
+
+  _createClass(Joystick, [{
+    key: "update",
+    value: function update() {
+      if (this.isConnected) {
+        var gamepad = navigator.getGamepads()[this.gamepad.index];
+
+        if (gamepad) {
+          this.readGamepad(gamepad);
+        }
+      }
+    }
+  }, {
+    key: "readGamepad",
+    value: function readGamepad(gamepad) {
+      for (var index = 0; index < this.numberOfBUttons; index++) {
+        if (this.buttonPressed(gamepad.buttons[index]) && !this.buttonPressed(this.previousGamepad.buttons[index])) {
+          var eventName = 'joystick' + this.JoystickNumber + 'button' + index;
+          console.log("Dispatch event: " + eventName);
+          document.dispatchEvent(new Event(eventName));
+        }
+
+        if (this.buttonPressed(gamepad.buttons[this.BUT1]) && this.buttonPressed(gamepad.buttons[this.BUT2]) && (!this.buttonPressed(this.previousGamepad.buttons[this.BUT1]) || !this.buttonPressed(this.previousGamepad.buttons[this.BUT2]))) {
+          document.dispatchEvent(new Event('redirect'));
+        }
+      } // gamepad has 4 axes, first is x, second is y
+      // an axe returns a float, only int is needed
+
+
+      this.axes[0] = Math.round(gamepad.axes[0]);
+      this.axes[1] = Math.round(gamepad.axes[1]);
+      this.previousGamepad = gamepad;
+    }
+    /**
+     * Helper function to filter some bad input
+     * @param b
+     */
+
+  }, {
+    key: "buttonPressed",
+    value: function buttonPressed(b) {
+      if (_typeof(b) == "object") {
+        return b.pressed;
+      }
+
+      return b == 1.0;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {}
+  }, {
+    key: "X",
+    get: function get() {
+      return Math.round(this.axes[0]);
+    }
+  }, {
+    key: "Y",
+    get: function get() {
+      return Math.round(this.axes[1]);
+    } // Joystick identifier
+
+  }, {
+    key: "JoystickNumber",
+    get: function get() {
+      return this.joystickNumber;
+    } // Current gamepad
+
+  }, {
+    key: "Gamepad",
+    get: function get() {
+      return this.gamepad;
+    },
+    set: function set(gamepad) {
+      this.gamepad = gamepad;
+    } // previous gamepad
+
+  }, {
+    key: "PreviousGamepad",
+    get: function get() {
+      return this.previousGamepad;
+    },
+    set: function set(previousGamepad) {
+      this.previousGamepad = previousGamepad;
+    }
+  }]);
+
+  return Joystick;
+}();
+
+exports.Joystick = Joystick;
+},{}],"utils/arcade.ts":[function(require,module,exports) {
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var joystick_1 = require("./joystick");
+
+var Arcade =
+/*#__PURE__*/
+function () {
+  /**
+   * Creates an arcade 'cabinet'
+   */
+  function Arcade() {
+    var _this = this;
+
+    _classCallCheck(this, Arcade);
+
+    this.REDIRECT_URL = "http://hr-cmgt.github.io/arcade-server";
+    this.joysticks = [];
+    document.addEventListener("redirect", function () {
+      return _this.onRedirect();
+    });
+    window.addEventListener("gamepadconnected", function (e) {
+      return _this.onGamePadConnected(e);
+    });
+    window.addEventListener("gamepaddisconnected", function (e) {
+      return _this.onGamePadDisconnected(e);
+    });
+  } // PROPERTIES
+
+
+  _createClass(Arcade, [{
+    key: "onRedirect",
+
+    /**
+     * Handles redirect fired from joystick
+     */
+    value: function onRedirect() {
+      window.location.href = this.REDIRECT_URL;
+    }
+    /**
+     * Handles connecting a joystick
+     * @param e Gamepad event
+     */
+
+  }, {
+    key: "onGamePadConnected",
+    value: function onGamePadConnected(e) {
+      console.log('Game pad connected');
+      console.log("Joystick number: " + e.gamepad.index);
+      var joystick = this.createAndAddJoystick(e.gamepad.index, 6);
+      joystick.isConnected = true;
+      joystick.PreviousGamepad = joystick.Gamepad;
+      joystick.Gamepad = e.gamepad;
+
+      if (joystick.PreviousGamepad == null) {
+        joystick.PreviousGamepad = e.gamepad;
+      }
+    }
+    /**
+     * Handles disconnecting a joystick
+     * @param e Gamepad event
+     */
+
+  }, {
+    key: "onGamePadDisconnected",
+    value: function onGamePadDisconnected(e) {
+      this.removeJoystick(e.gamepad.index);
+    }
+    /**
+     * Creates an Joystick and adds it to this arcade
+     * @param joystickNumber Unique identifier given by the joystick
+     * @param numOfButtons Sets number of buttons on joystick
+     */
+
+  }, {
+    key: "createAndAddJoystick",
+    value: function createAndAddJoystick(joystickNumber, numOfButtons) {
+      var joystickCheck = this.getJoystickByNumber(joystickNumber);
+
+      if (joystickCheck != null) {
+        return joystickCheck;
+      }
+
+      var joystickNew = new joystick_1.Joystick(joystickNumber, numOfButtons);
+      this.joysticks[joystickNumber] = joystickNew;
+      return joystickNew;
+    }
+    /**
+     * Removes a Joystick from this arcade
+     * @param joystickNumber Unique identifier of the joystick
+     */
+
+  }, {
+    key: "removeJoystick",
+    value: function removeJoystick(joystickNumber) {
+      var joystickCheck = this.getJoystickByNumber(joystickNumber);
+
+      if (joystickCheck == null) {
+        return;
+      }
+
+      var index = this.joysticks.indexOf(joystickCheck);
+      this.joysticks[index].destroy();
+
+      if (index > -1) {
+        this.joysticks.splice(index, 1);
+      }
+    }
+    /**
+     * Get a Joystick with its unique identifier
+     * @param joystickNumber Unique identifier given by the joystick
+     */
+
+  }, {
+    key: "getJoystickByNumber",
+    value: function getJoystickByNumber(joystickNumber) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.joysticks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var joystick = _step.value;
+
+          if (joystick.JoystickNumber == joystickNumber) {
+            return joystick;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return null;
+    }
+  }, {
+    key: "Joysticks",
+    get: function get() {
+      return this.joysticks;
+    }
+  }]);
+
+  return Arcade;
+}();
+
+exports.Arcade = Arcade;
+},{"./joystick":"utils/joystick.ts"}],"CST.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -127,22 +425,301 @@ exports.CST = {
   SCENES: {
     LOAD: "LOAD",
     MENU: "MENU",
-    PLAY: "PLAY"
+    PLAY: "PLAY",
+    GAMEOVER: "GAMEOVER"
   },
   IMAGE: {
-    OPTIONS: "options_button.png",
-    PLAY: "play_button.png",
-    TITLE: "background.jpg"
+    OPTIONS: "options_button2.png",
+    PLAY: "play_button2.png",
+    TITLE: "background2.jpg"
   },
   AUDIO: {},
   SPRITE: {}
 };
-},{}],"assets/image/play_button.png":[function(require,module,exports) {
-module.exports = "/play_button.612f9d30.png";
-},{}],"assets/image/options_button.png":[function(require,module,exports) {
-module.exports = "/options_button.d065e32d.png";
-},{}],"assets/image/background.jpg":[function(require,module,exports) {
-module.exports = "/background.970f52a8.jpg";
+},{}],"assets/image/block.png":[function(require,module,exports) {
+module.exports = "/block.50bf629f.png";
+},{}],"assets/image/enemy.png":[function(require,module,exports) {
+module.exports = "/enemy.bb5a0a1e.png";
+},{}],"assets/image/character.png":[function(require,module,exports) {
+module.exports = "/character.6e2ca09d.png";
+},{}],"assets/image/Food.png":[function(require,module,exports) {
+module.exports = "/Food.2497f5cd.png";
+},{}],"assets/image/play_button2.png":[function(require,module,exports) {
+module.exports = "/play_button2.cb213a99.png";
+},{}],"assets/image/options_button2.png":[function(require,module,exports) {
+module.exports = "/options_button2.855eb198.png";
+},{}],"assets/image/background2.jpg":[function(require,module,exports) {
+module.exports = "/background2.80d45458.jpg";
+},{}],"assets/image/tileset_dungeon2.png":[function(require,module,exports) {
+module.exports = "/tileset_dungeon2.3d3957b7.png";
+},{}],"assets/maps/level1.json":[function(require,module,exports) {
+module.exports = {
+  "height": 15,
+  "infinite": false,
+  "layers": [{
+    "data": "KgAAACoAAAAwAAAAKgAAACoAAAAqAAAAMAAAACoAAAAwAAAAMAAAACoAAAAwAAAAMAAAACoAAAAwAAAAKgAAACoAAAAqAAAAMAAAACoAAAAqAAAAKgAAADAAAAAqAAAAKgAAACoAAAAwAAAAMAAAADAAAAAwAAAAMAAAACoAAAAwAAAAMAAAACoAAAAwAAAAMAAAADAAAAAwAAAAMAAAACoAAAAqAAAAKgAAACoAAAAwAAAAKgAAACoAAAAwAAAAKgAAACoAAAAwAAAAKgAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAqAAAAKgAAACoAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAqAAAAKgAAACoAAAAwAAAAMAAAADAAAAAqAAAAKgAAACoAAAAqAAAAMAAAACoAAAAqAAAAMAAAADAAAAAqAAAAMAAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAACoAAAAwAAAAKgAAACoAAAAwAAAAKgAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAACoAAAAwAAAAMAAAACoAAAAwAAAAMAAAADAAAAAwAAAAKgAAADAAAAAwAAAAKgAAACoAAAAqAAAAKgAAACoAAAAwAAAAMAAAACoAAAAwAAAAKgAAACoAAAAqAAAAMAAAACoAAAAqAAAAMAAAADAAAAAwAAAAMAAAACoAAAAqAAAAMAAAACoAAAAqAAAAMAAAACoAAAAwAAAAMAAAADAAAAAqAAAAMAAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAwAAAAMAAAACoAAAAwAAAAKgAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAwAAAAMAAAACoAAAAwAAAAKgAAADAAAAAwAAAAKgAAADAAAAAwAAAAMAAAADAAAAAqAAAAKgAAADAAAAAwAAAAMAAAACoAAAAqAAAAKgAAACoAAAAwAAAAMAAAACoAAAAqAAAAKgAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAwAAAAKgAAADAAAAAwAAAAKgAAACoAAAAwAAAAMAAAADAAAAAqAAAAKgAAADAAAAAqAAAAKgAAADAAAAAwAAAAMAAAACoAAAAwAAAAMAAAADAAAAAwAAAAKgAAACoAAAAqAAAAKgAAADAAAAAwAAAAMAAAACoAAAAwAAAAMAAAADAAAAAqAAAAMAAAADAAAAAwAAAAKgAAADAAAAAqAAAAMAAAACoAAAAwAAAAKgAAACoAAAAqAAAAMAAAADAAAAAwAAAAKgAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAqAAAAKgAAADAAAAAwAAAAKgAAADAAAAAwAAAAMAAAADAAAAAwAAAAKgAAADAAAAAwAAAAKgAAADAAAAAwAAAAMAAAACoAAAAwAAAAKgAAACoAAAAqAAAAKgAAACoAAAAwAAAAMAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAwAAAAKgAAADAAAAAwAAAAKgAAACoAAAAqAAAA",
+    "encoding": "base64",
+    "height": 15,
+    "id": 1,
+    "name": "ground",
+    "opacity": 1,
+    "type": "tilelayer",
+    "visible": false,
+    "width": 20,
+    "x": 0,
+    "y": 0
+  }, {
+    "data": "JQAAACYAAAAmAAAAJgAAACYAAAAmAAAAJgAAACYAAAAmAAAAJgAAACYAAAAmAAAAJgAAACYAAAAmAAAAJgAAACYAAAAmAAAAJgAAACcAAAAtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALwAAAC0AAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAoAAAAKAAAACgAAAAAAAAAKAAAAAAAAAAvAAAALQAAAAAAAAAwAAAAAAAAACUAAAAnAAAAAAAAACgAAAAoAAAAKAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAwAAAAAAAAAC8AAAAtAAAAAAAAACgAAAAAAAAALQAAAC8AAAAAAAAAAAAAAAAAAAAoAAAAAAAAACgAAAAoAAAAKAAAAAAAAAAoAAAAAAAAACgAAAAAAAAALwAAAC0AAAAAAAAAKAAAAAAAAAAtAAAALwAAAAAAAAAoAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAoAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAvAAAALQAAAAAAAAAoAAAAAAAAADUAAAA3AAAAAAAAACgAAAAAAAAAAAAAAAAAAAAoAAAAKAAAACgAAAAAAAAAKAAAACgAAAAoAAAAAAAAAC8AAAAtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAACgAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALwAAAC0AAAAAAAAAKAAAACgAAAAAAAAAKAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAoAAAAKAAAADAAAAAoAAAAKAAAAAAAAAAvAAAALQAAAAAAAAAoAAAAAAAAAAAAAAAoAAAAMAAAACgAAAAAAAAAKAAAAAAAAAAoAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAC8AAAAtAAAAAAAAADAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAKAAAAAAAAAAoAAAAKAAAACgAAAAAAAAALwAAAC0AAAAAAAAAKAAAAAAAAAAAAAAAKAAAACgAAAAoAAAAMAAAACgAAAAAAAAAKAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvAAAALQAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAKAAAACgAAAAwAAAAKAAAACgAAAAoAAAAAAAAAC8AAAAtAAAAAAAAACgAAAAAAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALwAAADUAAAA2AAAANgAAADYAAAA2AAAANgAAADYAAAA2AAAANgAAADYAAAA2AAAANgAAADYAAAA2AAAANgAAADYAAAA2AAAANgAAADYAAAA3AAAA",
+    "encoding": "base64",
+    "height": 15,
+    "id": 3,
+    "name": "top",
+    "opacity": 1,
+    "type": "tilelayer",
+    "visible": true,
+    "width": 20,
+    "x": 0,
+    "y": 0
+  }, {
+    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAA8AAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "encoding": "base64",
+    "height": 15,
+    "id": 2,
+    "name": "wall",
+    "opacity": 1,
+    "type": "tilelayer",
+    "visible": false,
+    "width": 20,
+    "x": 0,
+    "y": 0
+  }, {
+    "draworder": "topdown",
+    "id": 5,
+    "name": "pushBlocks",
+    "objects": [{
+      "gid": 65,
+      "height": 32,
+      "id": 16,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 64,
+      "y": 128
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 17,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 64,
+      "y": 352
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 18,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 64,
+      "y": 416
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 19,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 192,
+      "y": 320
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 20,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 256,
+      "y": 384
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 22,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 224,
+      "y": 96
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 23,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 352,
+      "y": 352
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 24,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 480,
+      "y": 288
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 25,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 448,
+      "y": 416
+    }, {
+      "gid": 65,
+      "height": 32,
+      "id": 26,
+      "name": "",
+      "rotation": 0,
+      "type": "",
+      "visible": true,
+      "width": 32,
+      "x": 544,
+      "y": 128
+    }],
+    "opacity": 1,
+    "type": "objectgroup",
+    "visible": true,
+    "x": 0,
+    "y": 0
+  }],
+  "nextlayerid": 6,
+  "nextobjectid": 27,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.2.3",
+  "tileheight": 32,
+  "tilesets": [{
+    "columns": 8,
+    "firstgid": 1,
+    "image": "..\/..\/..\/..\/..\/..\/Downloads\/dungeonTileset.png",
+    "imageheight": 256,
+    "imagewidth": 256,
+    "margin": 0,
+    "name": "dungeonTileset",
+    "spacing": 0,
+    "tilecount": 64,
+    "tileheight": 32,
+    "tiles": [{
+      "id": 36,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 37,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 38,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 39,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 44,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 45,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 46,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 52,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 53,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }, {
+      "id": 54,
+      "properties": [{
+        "name": "collides",
+        "type": "bool",
+        "value": true
+      }]
+    }],
+    "tilewidth": 32
+  }, {
+    "columns": 1,
+    "firstgid": 65,
+    "image": "..\/..\/..\/..\/..\/..\/Downloads\/block.png",
+    "imageheight": 32,
+    "imagewidth": 32,
+    "margin": 0,
+    "name": "block",
+    "spacing": 0,
+    "tilecount": 1,
+    "tileheight": 32,
+    "tilewidth": 32
+  }],
+  "tilewidth": 32,
+  "type": "map",
+  "version": 1.2,
+  "width": 20
+};
 },{}],"scenes/LoadScene.ts":[function(require,module,exports) {
 "use strict";
 
@@ -184,75 +761,110 @@ function (_Phaser$Scene) {
   }
 
   _createClass(LoadScene, [{
-    key: "init",
-    value: function init() {}
-  }, {
     key: "loadImages",
     value: function loadImages() {
-      this.load.image("play_button", require("../assets/image/play_button.png"));
-      this.load.image("options_button", require("../assets/image/options_button.png"));
-      this.load.image("background", require("../assets/image/background.jpg"));
-    }
-  }, {
-    key: "loadAudio",
-    value: function loadAudio() {
-      this.load.setPath("../assets/audio");
-
-      for (var prop in CST_1.CST.AUDIO) {
-        //@ts-ignore
-        this.load.audio(CST_1.CST.AUDIO[prop], CST_1.CST.AUDIO[prop]);
-      }
-    } // @ts-ignore
-
-  }, {
-    key: "loadSprites",
-    value: function loadSprites(frameConfig) {
-      this.load.setPath("../assets/sprite");
-
-      for (var prop in CST_1.CST.SPRITE) {
-        //@ts-ignore
-        this.load.spritesheet(CST_1.CST.SPRITE[prop], CST_1.CST.SPRITE[prop], frameConfig);
-      }
+      this.load.spritesheet("pushBlock", require("../assets/image/block.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
+      this.load.spritesheet("monster", require("../assets/image/enemy.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
+      this.load.spritesheet("characterBait", require("../assets/image/character.png"), {
+        frameWidth: 32,
+        frameHeight: 32
+      });
+      this.load.spritesheet("bait", require("../assets/image/Food.png"), {
+        frameWidth: 16,
+        frameHeight: 16
+      });
+      this.load.image("play_button", require("../assets/image/play_button2.png"));
+      this.load.image("options_button", require("../assets/image/options_button2.png"));
+      this.load.image("background", require("../assets/image/background2.jpg"));
     }
   }, {
     key: "preload",
     value: function preload() {
       var _this = this;
 
-      //load image, spritesheet, sound
-      this.loadImages(); //create loading bar
+      this.loadImages(); //load map
 
-      var loadingBar = this.add.graphics({
-        fillStyle: {
-          color: 0xffffff //white
+      this.load.image("Dungeon", require("../assets/image/tileset_dungeon2.png"));
+      this.load.tilemapTiledJSON("mappy", require("../assets/maps/level1.json")); // loading bar
 
+      var progressBar = this.add.graphics();
+      var progressBox = this.add.graphics();
+      progressBox.fillStyle(0x222222, 0.8);
+      progressBox.fillRect(160.5, 270, 320, 50);
+      var width = this.cameras.main.width;
+      var height = this.cameras.main.height;
+      var loadingText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 50,
+        text: 'Loading...',
+        style: {
+          font: '20px monospace',
+          fill: '#ffffff'
         }
+      });
+      loadingText.setOrigin(0.5, 0.5);
+      var percentText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 5,
+        text: '0%',
+        style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+        }
+      });
+      percentText.setOrigin(0.5, 0.5);
+      var assetText = this.make.text({
+        x: width / 2,
+        y: height / 2 + 50,
+        text: '',
+        style: {
+          font: '18px monospace',
+          fill: '#ffffff'
+        }
+      });
+      assetText.setOrigin(0.5, 0.5); // @ts-ignore
+
+      this.load.on('progress', function (value) {
+        // @ts-ignore
+        percentText.setText(parseInt(value * 100) + '%');
+        progressBar.clear();
+        progressBar.fillStyle(0xffffff, 1);
+        progressBar.fillRect(175.5, 280, 290 * value, 30);
+      }); // @ts-ignore
+
+      this.load.on('fileprogress', function (file) {
+        assetText.setText('Loading asset: ' + file.key);
+      });
+      this.load.on("complete", function () {
+        progressBar.destroy();
+        progressBox.destroy();
+        loadingText.destroy();
+        percentText.destroy();
+        assetText.destroy();
+
+        _this.scene.start(CST_1.CST.SCENES.MENU);
       }); //simulate large load
 
-      for (var i = 0; i < 100; i++) {
+      for (var i = 0; i < 200; i++) {
         this.load.spritesheet("cat" + i, "./assets/cat.png", {
           frameHeight: 32,
           frameWidth: 32
         });
       }
-
-      this.load.on("progress", function (percent) {
-        loadingBar.fillRect(0, _this.game.renderer.height / 2, _this.game.renderer.width * percent, 50);
-      });
-      this.load.on("complete", function () {
-        _this.scene.start(CST_1.CST.SCENES.MENU);
-      });
     }
-  }, {
-    key: "create",
-    value: function create() {}
   }]);
 
   return LoadScene;
 }(Phaser.Scene);
 
 exports.LoadScene = LoadScene;
-},{"../CST":"CST.ts","../assets/image/play_button.png":"assets/image/play_button.png","../assets/image/options_button.png":"assets/image/options_button.png","../assets/image/background.jpg":"assets/image/background.jpg"}],"scenes/MenuScene.ts":[function(require,module,exports) {
+},{"../CST":"CST.ts","../assets/image/block.png":"assets/image/block.png","../assets/image/enemy.png":"assets/image/enemy.png","../assets/image/character.png":"assets/image/character.png","../assets/image/Food.png":"assets/image/Food.png","../assets/image/play_button2.png":"assets/image/play_button2.png","../assets/image/options_button2.png":"assets/image/options_button2.png","../assets/image/background2.jpg":"assets/image/background2.jpg","../assets/image/tileset_dungeon2.png":"assets/image/tileset_dungeon2.png","../assets/maps/level1.json":"assets/maps/level1.json"}],"scenes/MenuScene.ts":[function(require,module,exports) {
 "use strict";
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -319,257 +931,392 @@ function (_Phaser$Scene) {
 }(Phaser.Scene);
 
 exports.MenuScene = MenuScene;
-},{"../CST":"CST.ts"}],"assets/image/tileset_dungeon.png":[function(require,module,exports) {
-module.exports = "/tileset_dungeon.3e7ca7aa.png";
-},{}],"assets/maps/testmap.json":[function(require,module,exports) {
-module.exports = {
-  "height": 15,
-  "infinite": false,
-  "layers": [{
-    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAAAAAAAAAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAAAAAAAAAAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAKgAAACoAAAAqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    "encoding": "base64",
-    "height": 15,
-    "id": 1,
-    "name": "ground",
-    "opacity": 1,
-    "type": "tilelayer",
-    "visible": true,
-    "width": 20,
-    "x": 0,
-    "y": 0
+},{"../CST":"CST.ts"}],"objects/characterBait.ts":[function(require,module,exports) {
+"use strict";
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var characterBait =
+/*#__PURE__*/
+function (_Phaser$Physics$Arcad) {
+  _inherits(characterBait, _Phaser$Physics$Arcad);
+
+  function characterBait(scene) {
+    var _this;
+
+    _classCallCheck(this, characterBait);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(characterBait).call(this, scene, 144, 415, "characterBait"));
+    var g = _this.scene.game;
+    _this.arcade = g.arcade;
+    _this.playScene = scene;
+
+    _this.scene.add.existing(_assertThisInitialized(_this));
+
+    _this.setDepth(5);
+
+    _this.addPhysics();
+
+    _this.addAnimations();
+
+    _this.keyboard = _this.scene.input.keyboard.addKeys("W, A, S, D, B, F");
+    return _this;
+  }
+
+  _createClass(characterBait, [{
+    key: "addPhysics",
+    value: function addPhysics() {
+      this.scene.physics.add.existing(this);
+      this.setSize(this.displayWidth, this.displayHeight);
+      this.setCollideWorldBounds(true);
+    }
   }, {
-    "data": "LgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAAAAAAAAAAAAA0AAAAAAAAACUAAAAnAAAAAAAAADQAAAAAAAAANAAAAAAAAAAlAAAAJwAAAAAAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAA0AAAAKgAAADQAAAAAAAAANQAAADcAAAAAAAAANAAAAAAAAAA0AAAAAAAAADUAAAA3AAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAACoAAAA0AAAANAAAAAAAAAAuAAAALgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4AAAAuAAAAAAAAADQAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAANAAAADQAAAAAAAAANAAAACoAAAA0AAAANAAAAAAAAAA0AAAALgAAAC4AAAAAAAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAAuAAAALgAAAAAAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAAAAAAACoAAAAAAAAANAAAAC4AAAAuAAAANAAAAAAAAAAAAAAAAAAAADQAAAA0AAAAAAAAADQAAAAAAAAAAAAAACoAAAAAAAAANAAAADQAAAAAAAAANAAAAAAAAAA0AAAALgAAAC4AAAA0AAAAAAAAACUAAAAnAAAANAAAADQAAAAAAAAANAAAACoAAAA0AAAANAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuAAAALgAAADQAAAAAAAAANQAAADcAAAA0AAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAADQAAAA0AAAAAAAAAC4AAAAuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAADQAAAA0AAAANAAAADQAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAAAAAAALgAAAC4AAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAAuAAAA",
-    "encoding": "base64",
-    "height": 15,
-    "id": 3,
-    "name": "top",
-    "opacity": 1,
-    "type": "tilelayer",
-    "visible": true,
-    "width": 20,
-    "x": 0,
-    "y": 0
+    key: "update",
+    value: function update() {
+      this.keyboardInput();
+      this.joystickInput();
+    }
   }, {
-    "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    "encoding": "base64",
-    "height": 15,
-    "id": 4,
-    "name": "wall",
-    "opacity": 1,
-    "type": "tilelayer",
-    "visible": true,
-    "width": 20,
-    "x": 0,
-    "y": 0
-  }],
-  "nextlayerid": 5,
-  "nextobjectid": 1,
-  "orientation": "orthogonal",
-  "renderorder": "right-down",
-  "tiledversion": "1.2.3",
-  "tileheight": 32,
-  "tilesets": [{
-    "columns": 8,
-    "firstgid": 1,
-    "image": "..\/..\/..\/..\/..\/..\/Downloads\/tileset_dungeon.png",
-    "imageheight": 256,
-    "imagewidth": 256,
-    "margin": 0,
-    "name": "tileset_dungeon",
-    "spacing": 0,
-    "tilecount": 64,
-    "tileheight": 32,
-    "tiles": [{
-      "id": 0,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 1,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 2,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 3,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 4,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 8,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 9,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 10,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 11,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 12,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 16,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 17,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 18,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 19,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 20,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 36,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 37,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 38,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 44,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 45,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 46,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 51,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 52,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 53,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }, {
-      "id": 54,
-      "properties": [{
-        "name": "collides",
-        "type": "bool",
-        "value": true
-      }]
-    }],
-    "tilewidth": 32
-  }],
-  "tilewidth": 32,
-  "type": "map",
-  "version": 1.2,
-  "width": 20
-};
-},{}],"assets/image/character.png":[function(require,module,exports) {
-module.exports = "/character.6e2ca09d.png";
-},{}],"assets/image/enemy.png":[function(require,module,exports) {
-module.exports = "/enemy.bb5a0a1e.png";
-},{}],"assets/image/block.png":[function(require,module,exports) {
-module.exports = "/block.50bf629f.png";
-},{}],"assets/image/Food.png":[function(require,module,exports) {
-module.exports = "/Food.2497f5cd.png";
+    key: "addAnimations",
+    value: function addAnimations() {
+      this.scene.anims.create({
+        key: "walk",
+        frames: this.scene.anims.generateFrameNumbers("characterBait", {
+          start: 3,
+          end: 5
+        }),
+        frameRate: 10
+      });
+    }
+  }, {
+    key: "joystickInput",
+    value: function joystickInput() {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.arcade.Joysticks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var joystick = _step.value;
+          joystick.update();
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      if (this.arcade.Joysticks[1]) {
+        this.play("walk", true);
+        this.setVelocityX(this.arcade.Joysticks[1].X * 100);
+        this.setVelocityY(this.arcade.Joysticks[1].Y * 100);
+
+        if (this.arcade.Joysticks[1].X == 1) {
+          this.flipX = false;
+        }
+
+        if (this.arcade.Joysticks[1].X == -1) {
+          this.flipX = true;
+        }
+
+        if (this.arcade.Joysticks[1].X == 0 && this.arcade.Joysticks[1].Y == 0) {
+          this.play("walk", false);
+        }
+      }
+    }
+  }, {
+    key: "keyboardInput",
+    value: function keyboardInput() {
+      // player movement
+      if (this.keyboard.W.isDown) {
+        this.setVelocityY(-100);
+        this.play("walk", true);
+        this.flipX = false;
+      }
+
+      if (this.keyboard.S.isDown) {
+        this.setVelocityY(100);
+        this.play("walk", true);
+      }
+
+      if (this.keyboard.A.isDown) {
+        this.setVelocityX(-100);
+        this.play("walk", true);
+        this.flipX = true;
+      }
+
+      if (this.keyboard.D.isDown) {
+        this.setVelocityX(100);
+        this.play("walk", true);
+        this.flipX = false;
+      }
+
+      if (this.keyboard.A.isUp && this.keyboard.D.isUp) {
+        this.setVelocityX(0);
+      }
+
+      if (this.keyboard.S.isUp && this.keyboard.W.isUp) {
+        this.setVelocityY(0);
+      }
+    }
+  }]);
+
+  return characterBait;
+}(Phaser.Physics.Arcade.Sprite);
+
+exports.characterBait = characterBait;
+},{}],"objects/pushBlock.ts":[function(require,module,exports) {
+"use strict";
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var pushBlock =
+/*#__PURE__*/
+function (_Phaser$Physics$Arcad) {
+  _inherits(pushBlock, _Phaser$Physics$Arcad);
+
+  function pushBlock(scene, x, y) {
+    var _this;
+
+    _classCallCheck(this, pushBlock);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(pushBlock).call(this, scene, x, y, "pushBlock"));
+    _this.playScene = scene;
+
+    _this.scene.add.existing(_assertThisInitialized(_this));
+
+    _this.setDepth(5);
+
+    _this.addPhysics();
+
+    _this.setImmovable(true);
+
+    return _this;
+  }
+
+  _createClass(pushBlock, [{
+    key: "addPhysics",
+    value: function addPhysics() {
+      this.scene.physics.add.existing(this);
+      this.setSize(this.displayWidth, this.displayHeight);
+      this.setCollideWorldBounds(true);
+    }
+  }]);
+
+  return pushBlock;
+}(Phaser.Physics.Arcade.Sprite);
+
+exports.pushBlock = pushBlock;
+},{}],"objects/enemy.ts":[function(require,module,exports) {
+"use strict";
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var enemy =
+/*#__PURE__*/
+function (_Phaser$Physics$Arcad) {
+  _inherits(enemy, _Phaser$Physics$Arcad);
+
+  function enemy(scene) {
+    var _this;
+
+    _classCallCheck(this, enemy);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(enemy).call(this, scene, 300, 350, "monster"));
+    _this.playScene = scene;
+
+    _this.scene.add.existing(_assertThisInitialized(_this));
+
+    _this.setDepth(5);
+
+    _this.addPhysics();
+
+    _this.addAnimations();
+
+    _this.play("walkenemy", true);
+
+    _this.setVelocityY(-100);
+
+    _this.flipX = true;
+    _this.walking_distance = Phaser.Math.Between(98, 255);
+    _this.direction = _this.angle;
+    _this.previous_position = _this.x;
+    return _this;
+  }
+
+  _createClass(enemy, [{
+    key: "addPhysics",
+    value: function addPhysics() {
+      this.scene.physics.add.existing(this);
+      this.setSize(this.displayWidth, this.displayHeight);
+      this.setCollideWorldBounds(true);
+    }
+  }, {
+    key: "addAnimations",
+    value: function addAnimations() {
+      this.scene.anims.create({
+        key: "walkenemy",
+        frames: this.scene.anims.generateFrameNumbers("monster", {
+          start: 0,
+          end: 3
+        }),
+        repeat: -1,
+        frameRate: 10
+      });
+    }
+  }, {
+    key: "collideWall",
+    value: function collideWall() {
+      // AI movement
+      var direction = Phaser.Math.Between(1, 4);
+
+      if (direction == 1) {
+        this.setVelocityY(-100);
+      } else if (direction == 2) {
+        this.setVelocityY(100);
+      } else if (direction == 3) {
+        this.setVelocityX(100);
+        this.flipX = false;
+      } else {
+        this.setVelocityX(-100);
+        this.flipX = true;
+      }
+    }
+  }, {
+    key: "update",
+    value: function update() {//test for better ai
+      // this.new_position =  this.x;
+      // if (Math.abs(this.new_position - this.previous_position) >= this.walking_distance) {
+      //     this.switch_direction();
+      // }
+    }
+  }, {
+    key: "switch_direction",
+    value: function switch_direction() {
+      this.previous_position = this.x;
+      this.body.velocity.x *= -1;
+      this.flipX = true;
+    }
+  }]);
+
+  return enemy;
+}(Phaser.Physics.Arcade.Sprite);
+
+exports.enemy = enemy;
+},{}],"objects/bait.ts":[function(require,module,exports) {
+"use strict";
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var bait =
+/*#__PURE__*/
+function (_Phaser$Physics$Arcad) {
+  _inherits(bait, _Phaser$Physics$Arcad);
+
+  function bait(scene, x, y) {
+    var _this;
+
+    _classCallCheck(this, bait);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(bait).call(this, scene, x, y, "bait", 50));
+    _this.playScene = scene;
+
+    _this.scene.add.existing(_assertThisInitialized(_this));
+
+    _this.setDepth(5);
+
+    return _this;
+  }
+
+  return bait;
+}(Phaser.Physics.Arcade.Sprite);
+
+exports.bait = bait;
 },{}],"scenes/PlayScene.ts":[function(require,module,exports) {
 "use strict";
 
@@ -597,6 +1344,14 @@ Object.defineProperty(exports, "__esModule", {
 
 var CST_1 = require("../CST");
 
+var characterBait_1 = require("../objects/characterBait");
+
+var pushBlock_1 = require("../objects/pushBlock");
+
+var enemy_1 = require("../objects/enemy");
+
+var bait_1 = require("../objects/bait");
+
 var PlayScene =
 /*#__PURE__*/
 function (_Phaser$Scene) {
@@ -610,66 +1365,54 @@ function (_Phaser$Scene) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(PlayScene).call(this, {
       key: CST_1.CST.SCENES.PLAY
     }));
-    _this.numberOfBait = 3;
-    _this.baitTimer = 1;
+    document.addEventListener("joystick1button1", function () {
+      return _this.placeBait();
+    });
+    _this.baitCounter = 3;
     return _this;
   }
 
   _createClass(PlayScene, [{
-    key: "preload",
-    value: function preload() {
-      this.load.image("Dungeon", require("../assets/image/tileset_dungeon.png"));
-      this.load.tilemapTiledJSON("mappy", require("../assets/maps/testmap.json"));
-      this.load.spritesheet("dude", require("../assets/image/character.png"), {
-        frameWidth: 32,
-        frameHeight: 32
-      });
-      this.load.spritesheet("enemy", require("../assets/image/enemy.png"), {
-        frameWidth: 32,
-        frameHeight: 32
-      });
-      this.load.spritesheet("block", require("../assets/image/block.png"), {
-        frameWidth: 32,
-        frameHeight: 32
-      });
-      this.load.spritesheet("bait", require("../assets/image/Food.png"), {
-        frameWidth: 16,
-        frameHeight: 16
-      });
-    }
-  }, {
     key: "create",
     value: function create() {
       //map
       var mappy = this.add.tilemap("mappy");
-      var terrain = mappy.addTilesetImage("tileset_dungeon", "Dungeon");
-      this.block = this.physics.add.sprite(176, 144, "block").setDepth(5).setImmovable(true);
-      this.block2 = this.physics.add.sprite(528, 304, "block").setDepth(5).setImmovable(true);
-      this.block3 = this.physics.add.sprite(300, 304, "block").setDepth(5).setImmovable(true); //layers
+      var terrain = mappy.addTilesetImage("dungeonTileset", "Dungeon"); //layers
 
       var ground = mappy.createStaticLayer("ground", [terrain], 0, 0).setDepth(0);
       var wall = mappy.createStaticLayer("wall", [terrain], 0, 0).setDepth(1);
-      var top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // player
+      var top = mappy.createStaticLayer("top", [terrain], 0, 0).setDepth(2); // pushable blocks
 
-      this.player = this.physics.add.sprite(144, 415, "dude").setDepth(5);
-      this.enemy = this.physics.add.sprite(300, 350, "enemy").setDepth(5).setImmovable(true);
-      this.enemy.flipX = true; //map collisions
+      var pushableBlocks = [];
+      pushableBlocks = mappy.createFromObjects("pushBlocks", 65, {
+        key: "pushableBlocks"
+      });
+      this.blockGroup = this.physics.add.group();
+
+      for (var i = 0; i < pushableBlocks.length; i++) {
+        this.blockGroup.add(new pushBlock_1.pushBlock(this, pushableBlocks[i].x, pushableBlocks[i].y));
+      } //bait
+
+
+      this.baitGroup = this.add.group({
+        runChildUpdate: true
+      }); // players
+
+      this.player = new characterBait_1.characterBait(this); // enemies
+
+      this.enemy = new enemy_1.enemy(this); //map collisions
 
       this.physics.add.collider(this.player, ground);
       this.physics.add.collider(this.player, wall);
       this.physics.add.collider(this.player, top);
+      this.physics.add.collider(this.player, this.blockGroup, this.bounceWall, undefined, this);
+      this.physics.add.collider(this.player, this.enemy, this.gameOver, undefined, this);
       this.physics.add.collider(this.enemy, ground);
       this.physics.add.collider(this.enemy, wall);
       this.physics.add.collider(this.enemy, top, this.collidewall, undefined, this);
-      this.physics.add.collider(this.block, top);
-      this.physics.add.collider(this.player, this.block, this.bounceWall, undefined, this);
-      this.physics.add.collider(this.block2, top);
-      this.physics.add.collider(this.player, this.block2, this.bounceWall, undefined, this);
-      this.physics.add.collider(this.block3, top);
-      this.physics.add.collider(this.player, this.block3, this.bounceWall, undefined, this);
-      this.physics.add.collider(this.enemy, this.block, this.enemyDie, undefined, this);
-      this.physics.add.collider(this.enemy, this.block2, this.enemyDie, undefined, this);
-      this.physics.add.collider(this.enemy, this.block3); //tile property
+      this.physics.add.collider(this.enemy, this.blockGroup, this.enemyDie, undefined, this);
+      this.physics.add.collider(this.blockGroup, top);
+      this.physics.add.overlap(this.player, this.baitGroup, this.pickupBait, undefined, this); //tile property collisions
 
       ground.setCollisionByProperty({
         collides: true
@@ -679,146 +1422,69 @@ function (_Phaser$Scene) {
       });
       top.setCollisionByProperty({
         collides: true
-      }); //animations
-
-      this.anims.create({
-        key: "walk",
-        frames: this.anims.generateFrameNumbers("dude", {
-          start: 3,
-          end: 5
-        }),
-        frameRate: 10
       });
-      this.anims.create({
-        key: "walkenemy",
-        frames: this.anims.generateFrameNumbers("enemy", {
-          start: 0,
-          end: 3
-        }),
-        repeat: -1,
-        frameRate: 10
-      }); // this.add.grid(this.game.renderer.width/2, this.game.renderer.height/2, 640, 480, 32, 32, 0x057605);
-      //keyboard input
+      this.keyObj = this.input.keyboard.addKey('B'); // Get key object
 
-      this.Keyboard = this.input.keyboard.addKeys("W, A, S, D, B, F"); // bait group
-
-      this.baitsgroup = this.add.group(); //enemy walking
-
-      this.enemy.setVelocityY(-100); // enemy animation
-
-      this.enemy.play("walkenemy", true);
+      this.Keyboard = this.input.keyboard.addKeys("F");
+    }
+  }, {
+    key: "placeBait",
+    value: function placeBait() {
+      if (this.baitCounter !== 0) {
+        this.baitGroup.add(new bait_1.bait(this, this.player.x, this.player.y), true);
+        this.baitCounter--;
+      }
+    }
+  }, {
+    key: "pickupBait",
+    value: function pickupBait(b) {
+      console.log("moi");
     }
   }, {
     key: "bounceWall",
-    value: function bounceWall() {
+    value: function bounceWall(b) {
       //move block when pushed
-      if (this.block.body.touching.left && this.Keyboard.F.isDown) this.block.setVelocityX(175);else if (this.block.body.touching.right && this.Keyboard.F.isDown) {
-        this.block.setVelocityX(-175);
-      } else if (this.block.body.touching.up && this.Keyboard.F.isDown) {
-        this.block.setVelocityY(175);
-      } else if (this.block.body.touching.down && this.Keyboard.F.isDown) {
-        this.block.setVelocityY(-175);
-      }
-      if (this.block2.body.touching.left && this.Keyboard.F.isDown) this.block2.setVelocityX(175);else if (this.block2.body.touching.right && this.Keyboard.F.isDown) {
-        this.block2.setVelocityX(-175);
-      } else if (this.block2.body.touching.up && this.Keyboard.F.isDown) {
-        this.block2.setVelocityY(175);
-      } else if (this.block2.body.touching.down && this.Keyboard.F.isDown) {
-        this.block2.setVelocityY(-175);
-      }
-      if (this.block3.body.touching.left && this.Keyboard.F.isDown) this.block3.setVelocityX(175);else if (this.block3.body.touching.right && this.Keyboard.F.isDown) {
-        this.block3.setVelocityX(-175);
-      } else if (this.block3.body.touching.up && this.Keyboard.F.isDown) {
-        this.block3.setVelocityY(175);
-      } else if (this.block3.body.touching.down && this.Keyboard.F.isDown) {
-        this.block3.setVelocityY(-175);
+      if (b.body.touching.left && this.Keyboard.F.isDown) b.setVelocityX(175);else if (b.body.touching.right && this.Keyboard.F.isDown) {
+        b.setVelocityX(-175);
+      } else if (b.body.touching.up && this.Keyboard.F.isDown) {
+        b.setVelocityY(175);
+      } else if (b.body.touching.down && this.Keyboard.F.isDown) {
+        b.setVelocityY(-175);
       }
     }
   }, {
+    key: "collidewall",
+    value: function collidewall() {
+      // @ts-ignore
+      this.enemy.collideWall();
+    }
+  }, {
+    key: "gameOver",
+    value: function gameOver() {
+      this.scene.start("gameover");
+    }
+  }, {
     key: "enemyDie",
-    value: function enemyDie() {
-      var _this2 = this;
-
-      if (this.block.body.velocity.x !== 0 || this.block.body.velocity.y !== 0) {
+    value: function enemyDie(b) {
+      if (b.body.velocity.x !== 0 || b.body.velocity.y !== 0) {
         this.enemy.destroy(); // slow block down
 
         setTimeout(function () {
-          _this2.block.setVelocity(0);
+          b.setVelocity(0);
         }, 150);
       } else {
         this.collidewall();
       }
     }
   }, {
-    key: "collidewall",
-    value: function collidewall() {
-      // AI movement
-      var direction = Phaser.Math.Between(1, 4);
-
-      if (direction == 1) {
-        this.enemy.setVelocityY(-100);
-      } else if (direction == 2) {
-        this.enemy.setVelocityY(100);
-      } else if (direction == 3) {
-        this.enemy.setVelocityX(100);
-        this.enemy.flipX = false;
-      } else {
-        this.enemy.setVelocityX(-100);
-        this.enemy.flipX = true;
-      }
-    }
-  }, {
     key: "update",
-    value: function update(time, delta) {
-      var _this3 = this;
-
-      // bait pickup
-      if (this.physics.world.overlap(this.player, this.baitsgroup) && this.Keyboard.B.isDown && this.baitTimer == 1) {
-        this.numberOfBait++;
+    value: function update() {
+      if (this.input.keyboard.checkDown(this.keyObj, 500)) {
+        this.placeBait();
       }
 
-      if (this.Keyboard.B.isDown && this.numberOfBait > 0 && this.baitTimer == 1 && !this.physics.world.overlap(this.player, this.baitsgroup)) {
-        this.numberOfBait--;
-        this.baitTimer = 0;
-        this.baitsgroup.add(this.physics.add.sprite(this.player.x, this.player.y, "bait").setDepth(5).setScale(1.25).setFrame(21).setImmovable(true));
-        setTimeout(function () {
-          _this3.baitTimer = 1;
-        }, 500);
-      } // player movement
-
-
-      if (this.Keyboard.W.isDown) {
-        this.player.setVelocityY(-100);
-        this.player.play("walk", true);
-        this.player.flipX = false;
-      }
-
-      if (this.Keyboard.S.isDown) {
-        this.player.setVelocityY(100);
-        this.player.play("walk", true);
-      }
-
-      if (this.Keyboard.A.isDown) {
-        this.player.setVelocityX(-100);
-        this.player.play("walk", true);
-        this.player.flipX = true;
-      }
-
-      if (this.Keyboard.D.isDown) {
-        this.player.setVelocityX(100);
-        this.player.play("walk", true);
-        this.player.flipX = false;
-      }
-
-      if (this.Keyboard.A.isUp && this.Keyboard.D.isUp) {
-        this.player.setVelocityX(0);
-      }
-
-      if (this.Keyboard.S.isUp && this.Keyboard.W.isUp) {
-        this.player.setVelocityY(0);
-      }
-
-      if (this.physics.world.collide(this.player, this.enemy)) {}
+      this.player.update();
+      this.enemy.update();
     }
   }]);
 
@@ -826,25 +1492,105 @@ function (_Phaser$Scene) {
 }(Phaser.Scene);
 
 exports.PlayScene = PlayScene;
-},{"../CST":"CST.ts","../assets/image/tileset_dungeon.png":"assets/image/tileset_dungeon.png","../assets/maps/testmap.json":"assets/maps/testmap.json","../assets/image/character.png":"assets/image/character.png","../assets/image/enemy.png":"assets/image/enemy.png","../assets/image/block.png":"assets/image/block.png","../assets/image/Food.png":"assets/image/Food.png"}],"main.ts":[function(require,module,exports) {
+},{"../CST":"CST.ts","../objects/characterBait":"objects/characterBait.ts","../objects/pushBlock":"objects/pushBlock.ts","../objects/enemy":"objects/enemy.ts","../objects/bait":"objects/bait.ts"}],"scenes/GameOverScene.ts":[function(require,module,exports) {
 "use strict";
-/** @type {import("./typings/phaser")} */
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var CST_1 = require("../CST");
+
+var GameOverScene =
+/*#__PURE__*/
+function (_Phaser$Scene) {
+  _inherits(GameOverScene, _Phaser$Scene);
+
+  function GameOverScene() {
+    _classCallCheck(this, GameOverScene);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(GameOverScene).call(this, {
+      key: "gameover"
+    }));
+  }
+
+  _createClass(GameOverScene, [{
+    key: "create",
+    value: function create() {
+      var _this = this;
+
+      var playAgainButton = this.add.text(400, 420, 'CLICK TO PLAY AGAIN ', {
+        fontFamily: 'Arial',
+        fontSize: 22,
+        color: '#ff3434'
+      }).setOrigin(0.5).setDepth(5);
+      playAgainButton.setInteractive();
+      playAgainButton.on("pointerup", function () {
+        _this.scene.start(CST_1.CST.SCENES.PLAY);
+      });
+      this.add.image(0, 0, "background").setOrigin(0).setDepth(0);
+    }
+  }]);
+
+  return GameOverScene;
+}(Phaser.Scene);
+
+exports.GameOverScene = GameOverScene;
+},{"../CST":"CST.ts"}],"main.ts":[function(require,module,exports) {
+"use strict";
+/** @type {import("./typings/phaser")} */
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var arcade_1 = require("./utils/arcade");
+
 var LoadScene_1 = require("./scenes/LoadScene");
 
 var MenuScene_1 = require("./scenes/MenuScene");
 
-var PlayScene_1 = require("./scenes/PlayScene"); // @ts-ignore
+var PlayScene_1 = require("./scenes/PlayScene");
+
+var GameOverScene_1 = require("./scenes/GameOverScene"); // @ts-ignore
 
 
-var game = new Phaser.Game({
-  width: 800,
-  height: 600,
-  scene: [LoadScene_1.LoadScene, MenuScene_1.MenuScene, PlayScene_1.PlayScene],
+var config = {
+  width: 640,
+  height: 480,
+  scene: [LoadScene_1.LoadScene, MenuScene_1.MenuScene, PlayScene_1.PlayScene, GameOverScene_1.GameOverScene],
   render: {
     pixelArt: true
   },
@@ -858,8 +1604,32 @@ var game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   }
+};
+
+var MonsterHunter =
+/*#__PURE__*/
+function (_Phaser$Game) {
+  _inherits(MonsterHunter, _Phaser$Game);
+
+  function MonsterHunter(config) {
+    var _this;
+
+    _classCallCheck(this, MonsterHunter);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MonsterHunter).call(this, config)); // create the arcade once, otherwise we keep connecting/disconnecting every scene
+
+    _this.arcade = new arcade_1.Arcade();
+    return _this;
+  }
+
+  return MonsterHunter;
+}(Phaser.Game);
+
+exports.MonsterHunter = MonsterHunter;
+window.addEventListener("load", function () {
+  return new MonsterHunter(config);
 });
-},{"./scenes/LoadScene":"scenes/LoadScene.ts","./scenes/MenuScene":"scenes/MenuScene.ts","./scenes/PlayScene":"scenes/PlayScene.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./utils/arcade":"utils/arcade.ts","./scenes/LoadScene":"scenes/LoadScene.ts","./scenes/MenuScene":"scenes/MenuScene.ts","./scenes/PlayScene":"scenes/PlayScene.ts","./scenes/GameOverScene":"scenes/GameOverScene.ts"}],"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -887,7 +1657,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50592" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56950" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
