@@ -1,4 +1,5 @@
 import { PlayScene } from "../scenes/PlayScene";
+import { Physics } from "phaser";
 
 export class enemy extends Phaser.Physics.Arcade.Sprite {
   private playScene: PlayScene;
@@ -7,8 +8,8 @@ export class enemy extends Phaser.Physics.Arcade.Sprite {
   private direction: number;
   private previous_position: number;
 
-  constructor(scene: PlayScene) {
-    super(scene, 300, 350, "monster");
+  constructor(scene: PlayScene, x:number, y:number) {
+    super(scene, x, y, "monster");
 
     this.playScene = scene;
     this.scene.add.existing(this);
@@ -21,6 +22,7 @@ export class enemy extends Phaser.Physics.Arcade.Sprite {
     this.walking_distance = Phaser.Math.Between(98, 255);
     this.direction = this.angle;
     this.previous_position = this.x;
+
   }
 
   private addPhysics() {

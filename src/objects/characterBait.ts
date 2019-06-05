@@ -21,7 +21,6 @@ export class characterBait extends Phaser.Physics.Arcade.Sprite {
     this.addPhysics();
     this.addAnimations();
     this.addParticles();
-    this.body.setSize(32, 28)
 
     this.keyboard = this.scene.input.keyboard.addKeys("W, A, S, D, B, F");
   }
