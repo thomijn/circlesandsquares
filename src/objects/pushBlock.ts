@@ -30,7 +30,6 @@ export class pushBlock extends Phaser.Physics.Arcade.Sprite {
             speed: 30,
             scale: { start: 0.1, end: 0.05 },
         });
-
     };
 
     public update() {

@@ -13,6 +13,7 @@ export class PlayScene extends Phaser.Scene {
     private Keyboard: any
     private canpickup: boolean;
     private enemyGroup: Phaser.Physics.Arcade.Group;
+    private emitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor() {
         super({
@@ -147,6 +148,21 @@ export class PlayScene extends Phaser.Scene {
         if (b.body.velocity.x !== 0 || b.body.velocity.y !== 0) {
             e.destroy()
 
+            var particles = this.add.particles('blood');
+
+            this.emitter = particles.createEmitter({
+                lifespan: 300,
+                speed: 75,
+                scale: { start: 0.1, end: 0.05 },
+                x: e.x,
+                y: e.y + 20
+            });
+            
+            setTimeout(() => {
+                this.emitter.stop()
+            }, 300);
+            
+
             // slow block down
             setTimeout(() => {
                 b.setVelocity(0);
@@ -154,6 +170,8 @@ export class PlayScene extends Phaser.Scene {
         } else {
             this.collidewall(e)
         }
+
+
     }
 
     update() {
@@ -162,5 +180,5 @@ export class PlayScene extends Phaser.Scene {
         }
 
         this.player.update()
-        }
+    }
 }
