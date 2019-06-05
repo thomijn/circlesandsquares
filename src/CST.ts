@@ -2,7 +2,8 @@ export const CST = {
   SCENES: {
     LOAD: "LOAD",
     MENU: "MENU",
-    PLAY: "PLAY"
+    PLAY: "PLAY",
+    GAMEOVER: "GAMEOVER"
   },
   IMAGE: {
     OPTIONS: "options_button2.png",

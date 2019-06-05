@@ -5,98 +5,105 @@ export class LoadScene extends Phaser.Scene {
       key: CST.SCENES.LOAD
     });
   }
-  init() {}
+
   loadImages() {
+    this.load.spritesheet("pushBlock", require("../assets/image/block.png"), {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    this.load.spritesheet("monster", require("../assets/image/enemy.png"), {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    this.load.spritesheet("characterBait", require("../assets/image/character.png"), {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    this.load.spritesheet("bait", require("../assets/image/Food.png"), {
+      frameWidth: 16,
+      frameHeight: 16
+  });
+
     this.load.image("play_button", require("../assets/image/play_button2.png"));
-    this.load.image(
-      "options_button",
-      require("../assets/image/options_button2.png")
-    );
+    this.load.image("options_button", require("../assets/image/options_button2.png"));
     this.load.image("background", require("../assets/image/background2.jpg"));
   }
-  loadAudio() {
-    this.load.setPath("../assets/audio");
 
-    for (let prop in CST.AUDIO) {
-      //@ts-ignore
-      this.load.audio(CST.AUDIO[prop], CST.AUDIO[prop]);
-    }
-  }
-  // @ts-ignore
-
-  loadSprites(frameConfig?: Phaser.Loader.FileTypes.ImageFrameConfig) {
-    this.load.setPath("../assets/sprite");
-
-    for (let prop in CST.SPRITE) {
-      //@ts-ignore
-      this.load.spritesheet(CST.SPRITE[prop], CST.SPRITE[prop], frameConfig);
-    }
-  }
   preload() {
-
     this.loadImages();
-    //load image, spritesheet, sound
+
+    //load map
+    this.load.image("Dungeon", require("../assets/image/tileset_dungeon2.png"));
+    this.load.tilemapTiledJSON("mappy", require("../assets/maps/level1.json"));
+
+    // loading bar
     var progressBar = this.add.graphics();
     var progressBox = this.add.graphics();
     progressBox.fillStyle(0x222222, 0.8);
-    progressBox.fillRect(240, 270, 320, 50);
+    progressBox.fillRect(160.5, 270, 320, 50);
 
     var width = this.cameras.main.width;
     var height = this.cameras.main.height;
     var loadingText = this.make.text({
-        x: width / 2,
-        y: height / 2 - 50,
-        text: 'Loading...',
-        style: {
-            font: '20px monospace',
-            fill: '#ffffff'
-        }
+      x: width / 2,
+      y: height / 2 - 50,
+      text: 'Loading...',
+      style: {
+        font: '20px monospace',
+        fill: '#ffffff'
+      }
     });
 
     loadingText.setOrigin(0.5, 0.5);
-    
+
     var percentText = this.make.text({
-        x: width / 2,
-        y: height / 2 - 5,
-        text: '0%',
-        style: {
-            font: '18px monospace',
-            fill: '#ffffff'
-        }
+      x: width / 2,
+      y: height / 2 - 5,
+      text: '0%',
+      style: {
+        font: '18px monospace',
+        fill: '#ffffff'
+      }
     });
     percentText.setOrigin(0.5, 0.5);
-    
+
     var assetText = this.make.text({
-        x: width / 2,
-        y: height / 2 + 50,
-        text: '',
-        style: {
-            font: '18px monospace',
-            fill: '#ffffff'
-        }
+      x: width / 2,
+      y: height / 2 + 50,
+      text: '',
+      style: {
+        font: '18px monospace',
+        fill: '#ffffff'
+      }
     });
 
     assetText.setOrigin(0.5, 0.5);
 
+    // @ts-ignore
     this.load.on('progress', function (value) {
-        percentText.setText(parseInt(value * 100) + '%');
-        progressBar.clear();
-        progressBar.fillStyle(0xffffff, 1);
-        progressBar.fillRect(250, 280, 300 * value, 30);
-    });
-    
-    this.load.on('fileprogress', function (file) {
-        assetText.setText('Loading asset: ' + file.key);
+      // @ts-ignore
+      percentText.setText(parseInt(value * 100) + '%');
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(175.5, 280, 290 * value, 30);
     });
 
-    this.load.on("complete", () =>  {
-        progressBar.destroy();
-        progressBox.destroy();
-        loadingText.destroy();
-        percentText.destroy();
-        assetText.destroy();
-        
-        this.scene.start(CST.SCENES.MENU);
+    // @ts-ignore
+    this.load.on('fileprogress', function (file) {
+      assetText.setText('Loading asset: ' + file.key);
+    });
+
+    this.load.on("complete", () => {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      percentText.destroy();
+      assetText.destroy();
+
+      this.scene.start(CST.SCENES.MENU);
     });
 
     //simulate large load
@@ -107,6 +114,4 @@ export class LoadScene extends Phaser.Scene {
       });
     }
   }
-
-  create() {}
 }
