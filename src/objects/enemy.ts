@@ -1,5 +1,4 @@
 import { PlayScene } from "../scenes/PlayScene";
-import { Physics } from "phaser";
 
 export class enemy extends Phaser.Physics.Arcade.Sprite {
   private playScene: PlayScene;
@@ -18,11 +17,12 @@ export class enemy extends Phaser.Physics.Arcade.Sprite {
     this.addAnimations();
     this.play("walkenemy", true);
     this.setVelocityY(-100);
+    this.body.setSize(32,20)
+    this.body.setOffset(0,2.5)
     this.flipX = true;
     this.walking_distance = Phaser.Math.Between(98, 255);
     this.direction = this.angle;
     this.previous_position = this.x;
-
   }
 
   private addPhysics() {
